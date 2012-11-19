@@ -36,6 +36,8 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -58,7 +60,7 @@ public class MainWindow extends JFrame{
 
 	
 	public void initUI() {
-
+		setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 		mainPanel = new JPanel(new MigLayout("", "grow,fill", "[][grow,fill, push]"));
 		
 		createMenubar();	
@@ -74,7 +76,7 @@ public class MainWindow extends JFrame{
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
 		Dimension dimension = toolkit.getScreenSize();
 		setSize(dimension);
-
+	
 	}
 	
 	public void createMenubar() {
@@ -96,15 +98,23 @@ public class MainWindow extends JFrame{
 		toolBar.setFloatable(false);
         toolBar.setRollover(true);
       
-        ImageIcon openIcon = new ImageIcon(getClass().getResource("/resources/must-have-icon-set-png/png/Open.png"));
-        ImageIcon saveIcon = new ImageIcon(getClass().getResource("/resources/must-have-icon-set-png/png/Save.png"));
+        ImageIcon saveFileIcon = new ImageIcon(getClass().getResource("/resources/must-have-icon-set-png/png/Save.png"));
+        ImageIcon newFileIcon = new ImageIcon(getClass().getResource("/resources/must-have-icon-set-png/png/Open.png"));
         
-        JButton openFileButton = new JButton(openIcon);
-        JButton saveFileButton = new JButton(saveIcon);
+        ImageIcon clearQuestionIcon = new ImageIcon(getClass().getResource("/resources/must-have-icon-set-png/png/Delete.png"));
+        ImageIcon saveQuestionIcon = new ImageIcon(getClass().getResource("/resources/must-have-icon-set-png/png/Check.png"));
+        
+        JButton openFileButton = new JButton(newFileIcon);
+        JButton saveFileButton = new JButton(saveFileIcon);
+        JButton clearQuestionButton = new JButton(clearQuestionIcon);
+        JButton saveQuestionButton = new JButton(saveQuestionIcon);
+
         
         toolBar.add(openFileButton);
         toolBar.add(saveFileButton);
-        
+        toolBar.add(saveQuestionButton);
+        toolBar.add(clearQuestionButton);
+              
         return toolBar;
 	}
 	
@@ -144,6 +154,21 @@ public class MainWindow extends JFrame{
 				mainWindow.setVisible(true);
 			}
 		});
+	}
+	
+	
+	private void setLookAndFeel(String lookAndFeel) {
+		try {
+			UIManager.setLookAndFeel(lookAndFeel);
+		} catch (ClassNotFoundException e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+		} catch (InstantiationException e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+		} catch (IllegalAccessException e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+		} catch (UnsupportedLookAndFeelException e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+		}
 	}
 	
 }
