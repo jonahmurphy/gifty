@@ -1,4 +1,4 @@
 gifty
 =====
 
-Easy Editor for generating questions iin GIFT format
+Easy Editor for formatting questions in GIFT format
