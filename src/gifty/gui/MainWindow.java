@@ -111,7 +111,7 @@ public class MainWindow extends JFrame{
 	public JTabbedPane createTabbedpane() {
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
-		tabbedPane.addTab( "True/False", new JPanel() );
+		tabbedPane.addTab( "True/False", new TrueFalseQuestionPanel() );
 		tabbedPane.addTab( "Multiple Choice", new JPanel() );
 		tabbedPane.addTab( "Essay", new JPanel()  );
 		tabbedPane.addTab( "Fill in the Blank", new JPanel()  );
