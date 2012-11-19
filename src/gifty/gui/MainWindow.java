@@ -17,15 +17,22 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package gifty.gui;
 
+import gifty.core.IQuestion;
+
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -45,6 +52,7 @@ import net.miginfocom.swing.MigLayout;
 public class MainWindow extends JFrame{
 	
 	private final static Logger logger = Logger.getLogger(MainWindow.class .getName()); 
+	
 	private static final int LOG_SIZE_IN_BYTES = 20000;
 	private static final int LOG_ROTATION_COUNT = 100;
 	
@@ -52,38 +60,65 @@ public class MainWindow extends JFrame{
 	private static final String APP_VERSION = "0.1.00001";
 	
 	private JPanel mainPanel;
+	
+	private Action openFileAction;
+	private Action saveFileAction;
+	private Action clearQuestionAction;
+	private Action newQuestionAction;
+	
+	JTabbedPane tabbedPane;
 
 	public MainWindow() {
 		initLogging();
 		initUI();
 	}
-
+	
 	
 	public void initUI() {
 		setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-		mainPanel = new JPanel(new MigLayout("", "grow,fill", "[][grow,fill, push]"));
 		
-		createMenubar();	
+		mainPanel = new JPanel(new MigLayout("", "grow,fill",
+				"[][grow,fill, push]"));
+
+		openFileAction = new OpenFileAction("Open File", createIcon("Open"),
+				"Open an existing GIFT file", new Integer(KeyEvent.VK_O));
+		
+		saveFileAction = new SaveFileAction("Save File", createIcon("Save"),
+				"Save current file GIFT question file", new Integer(
+						KeyEvent.VK_S));
+		
+		clearQuestionAction = new ClearQuestionAction("Clear Question",
+				createIcon("Delete"), "Clear Question",
+				new Integer(KeyEvent.VK_S));
+
+		newQuestionAction = new NewQuestionAction("New Question",
+				createIcon("Check"), "New Question",
+				new Integer(KeyEvent.VK_S));
+
+		createMenubar();
 		JToolBar toolbar = createToolbar();
 		JTabbedPane tabbedPane = createTabbedpane();
-		
+
 		mainPanel.add(toolbar, "grow, wrap");
 		mainPanel.add(tabbedPane, "grow, push");
 		setContentPane(mainPanel);
-		
-		//Maximise the frame
+
+		// Maximise the frame
 		setState(Frame.NORMAL);
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
 		Dimension dimension = toolkit.getScreenSize();
 		setSize(dimension);
-	
+
 	}
 	
+
 	public void createMenubar() {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
-		JMenuItem saveFileMenuItem = new JMenuItem("Save file");
-		JMenuItem openFileMenuItem = new JMenuItem("Open file");
+		JMenuItem saveFileMenuItem = new JMenuItem(saveFileAction);
+		JMenuItem openFileMenuItem = new JMenuItem(openFileAction);
+		saveFileMenuItem.setIcon(null);
+		openFileMenuItem.setIcon(null);
 		
 		fileMenu.add(saveFileMenuItem);
 		fileMenu.add(openFileMenuItem);
@@ -97,17 +132,16 @@ public class MainWindow extends JFrame{
 		JToolBar toolBar = new JToolBar("");
 		toolBar.setFloatable(false);
         toolBar.setRollover(true);
-      
-        ImageIcon saveFileIcon = new ImageIcon(getClass().getResource("/resources/must-have-icon-set-png/png/Save.png"));
-        ImageIcon newFileIcon = new ImageIcon(getClass().getResource("/resources/must-have-icon-set-png/png/Open.png"));
+
+        JButton openFileButton = new JButton(openFileAction);
+        JButton saveFileButton = new JButton(saveFileAction);
+        JButton clearQuestionButton = new JButton(clearQuestionAction);
+        JButton saveQuestionButton = new JButton(newQuestionAction);
         
-        ImageIcon clearQuestionIcon = new ImageIcon(getClass().getResource("/resources/must-have-icon-set-png/png/Delete.png"));
-        ImageIcon saveQuestionIcon = new ImageIcon(getClass().getResource("/resources/must-have-icon-set-png/png/Check.png"));
-        
-        JButton openFileButton = new JButton(newFileIcon);
-        JButton saveFileButton = new JButton(saveFileIcon);
-        JButton clearQuestionButton = new JButton(clearQuestionIcon);
-        JButton saveQuestionButton = new JButton(saveQuestionIcon);
+        openFileButton.setText(""); 
+        saveFileButton.setText("");  
+        clearQuestionButton.setText(""); 
+        saveQuestionButton .setText(""); 
 
         
         toolBar.add(openFileButton);
@@ -120,7 +154,7 @@ public class MainWindow extends JFrame{
 	
 	public JTabbedPane createTabbedpane() {
 
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
+		tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
 		tabbedPane.addTab( "True/False", new TrueFalseQuestionPanel() );
 		tabbedPane.addTab( "Multiple Choice", new JPanel() );
 		tabbedPane.addTab( "Essay", new JPanel()  );
@@ -129,9 +163,23 @@ public class MainWindow extends JFrame{
 		tabbedPane.addTab( "Math range", new JPanel()  );
 		tabbedPane.addTab( "Math range with interval end points", new JPanel()  );
 		tabbedPane.addTab( "Multiple numeric answers with partial credit", new JPanel()  );
-		
+
 		return tabbedPane;	
 	}
+	
+	private Icon createIcon(String imageName) {
+		String imageLocation = "/resources/must-have-icon-set-png/png/" + imageName+ ".png";
+		java.net.URL imageURL = getClass().getResource(imageLocation);
+
+		if (imageURL == null) {
+			logger.log(Level.SEVERE, "Image not found: " + imageLocation);
+			return new ImageIcon();
+		} else {
+			return new ImageIcon(imageURL);
+		}
+
+	}
+
 	
 	public void  initLogging() {
 		logger.setLevel(Level.FINEST);
@@ -171,4 +219,94 @@ public class MainWindow extends JFrame{
 		}
 	}
 	
+	
+	private void newQuestion() {
+		IQuestion questionPanel = (IQuestion)tabbedPane.getComponent(0);
+
+		String formattedQuestion = questionPanel.getFormattedQuestion();
+		
+		if(formattedQuestion.compareTo("") == 0) {
+			return;
+		}
+		System.out.println("Got formatted question " + formattedQuestion);
+	}
+	
+
+	private void clearQuestion() {
+		IQuestion questionPanel = (IQuestion)tabbedPane.getComponent(0);
+
+		questionPanel.clearQuestion();
+	}
+
+	
+	/////////////////////////////////////////////////////
+	//actions
+	
+	
+	class SaveFileAction extends AbstractAction {
+		public SaveFileAction(String text, Icon icon, String desc,
+				Integer mnemonic) {
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			System.out.println("saveFileaction...");
+			
+		}
+
+	}
+	
+	class OpenFileAction extends AbstractAction {
+		public OpenFileAction(String text, Icon icon, String desc,
+				Integer mnemonic) {
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			System.out.println("openFileaction...");
+			
+		}
+
+	}
+	
+	class NewQuestionAction extends AbstractAction {
+		public NewQuestionAction(String text, Icon icon, String desc,
+				Integer mnemonic) {
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			newQuestion();		
+		}
+	}
+	
+	
+	class ClearQuestionAction extends AbstractAction {
+		public ClearQuestionAction(String text, Icon icon, String desc,
+				Integer mnemonic) {
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			clearQuestion();
+
+		}
+
+	}
 }

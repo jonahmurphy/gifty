@@ -1,5 +1,7 @@
 package gifty.gui;
 
+import java.util.logging.Logger;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -9,30 +11,71 @@ import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
 
-public class TrueFalseQuestionPanel extends JPanel {
+import gifty.core.GIFTQuestionFormatter;
+import gifty.core.IQuestion;
+
+public class TrueFalseQuestionPanel extends JPanel implements IQuestion {
+
+	private final static Logger logger = Logger
+			.getLogger(TrueFalseQuestionPanel.class.getName());
+
+	private GIFTQuestionFormatter formatter;
+	private JTextField questionTitleTextfield;
+	private JTextArea questionTextarea;
+	private RadioButtonGroupPanel trueFalseRbgPnl;
+
+	final private static String TRUE_BUTTON_NAME = "True";
+	final private static String FALSE_BUTTON_NAME = "False";
 
 	public TrueFalseQuestionPanel() {
+		formatter = new GIFTQuestionFormatter();
 		initLayout();
 	}
-	
+
 	public void initLayout() {
 		JLabel questionTitleLbl = new JLabel("Question Title (optional)");
-		JTextField questionTitleTextfield = new JTextField(20);
-		
+		questionTitleTextfield = new JTextField(20);
+
 		JLabel questionLbl = new JLabel("Question");
-		JTextArea questionTextarea = new JTextArea();
-		
-		RadioButtonGroupPanel trueFalseRbgPnl = new RadioButtonGroupPanel(new String[]{"True", "False"}, "True");
+		questionTextarea = new JTextArea();
+
+		trueFalseRbgPnl = new RadioButtonGroupPanel(new String[] {
+				TRUE_BUTTON_NAME, FALSE_BUTTON_NAME }, "True");
 		setLayout(new MigLayout("", "[][grow]", "[][grow][]"));
-		
+
 		add(questionTitleLbl, "align right");
 		add(questionTitleTextfield, "growx, wrap");
-		
+
 		add(questionLbl, "align right top");
 		add(questionTextarea, "grow, wrap");
-		
+
 		add(new JLabel("True / False"), "align right top");
-		add(trueFalseRbgPnl, "align left");	
+		add(trueFalseRbgPnl, "align left");
+	}
+
+	@Override
+	public String getFormattedQuestion() {
+		String questionTitle = questionTitleTextfield.getText();
+		String question = questionTextarea.getText();
+		boolean isTrue = trueFalseRbgPnl.isButtonSelected(TRUE_BUTTON_NAME);
+
+		if (question.compareTo("") == 0) {
+			DialogUtil.showErrorDialog(this,
+					"You need a question body to create a question!");
+			return "";
+		}
+
+		String formattedQuestion = formatter.formatTrueFalseQuestion(
+				questionTitle, question, isTrue);
+		return formattedQuestion;
+	}
+
+	@Override
+	public void clearQuestion() {
+		questionTitleTextfield.setText("");
+		questionTextarea.setText("");
+		trueFalseRbgPnl.setSelectedButtonByName(TRUE_BUTTON_NAME);
+		
 	}
 
 }

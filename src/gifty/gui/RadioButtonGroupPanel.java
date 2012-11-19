@@ -1,6 +1,8 @@
 package gifty.gui;
 
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
@@ -10,6 +12,8 @@ import net.miginfocom.swing.MigLayout;
 
 public class RadioButtonGroupPanel extends JPanel {
 
+	private final static Logger logger = Logger.getLogger(RadioButtonGroupPanel.class.getName()); 
+	
 	private String[] buttonNames;
 	private HashMap<String,JRadioButton> buttonMap;
 	private String defaultCheckedButton;
@@ -33,7 +37,37 @@ public class RadioButtonGroupPanel extends JPanel {
 		
 	}
 	
-	public void buildButtons() {
+	public String getSelectedButtonname() {
+		for(String buttonName : buttonNames) {
+			if(buttonMap.get(buttonName).isSelected()) {
+				return buttonName;
+			}
+		}
+		return "";
+	}
+	
+	public boolean setSelectedButtonByName(String name) {
+
+		if(buttonMap.containsKey(name)) {
+			buttonMap.get(name).setSelected(true);
+			return true;
+		}else {
+			logger.log(Level.SEVERE, "No button with the name" + name + " exits");
+			return false;
+		}
+	}
+	
+	
+	public boolean isButtonSelected(String name) {
+		if(buttonMap.containsKey(name)) {
+			return buttonMap.get(name).isSelected();
+		}else {
+			logger.log(Level.SEVERE, "No button with the name" + name + " exits");
+			return false;
+		}
+	}
+	
+	private void buildButtons() {
 		ButtonGroup buttonGroup = new ButtonGroup();
 		setLayout(new MigLayout(""));
 		
@@ -47,19 +81,6 @@ public class RadioButtonGroupPanel extends JPanel {
 		
 		buttonMap.get(defaultCheckedButton).setSelected(true);
 
-	}
-	
-	public String getSelectedButtonname() {
-		for(String buttonName : buttonNames) {
-			if(buttonMap.get(buttonName).isSelected()) {
-				return buttonName;
-			}
-		}
-		return "";
-	}
-	
-	public void setSelectedButtonByName(String name) {
-		buttonMap.get(name).setSelected(true);
 	}
 
 }
