@@ -13,10 +13,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+ */
 
 package gifty.gui;
 
+import gifty.core.FileManager;
 import gifty.core.IQuestion;
 
 import java.awt.Dimension;
@@ -24,7 +25,11 @@ import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -35,6 +40,7 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -42,65 +48,83 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.BevelBorder;
 
 import net.miginfocom.swing.MigLayout;
 
+public class MainWindow extends JFrame {
 
-public class MainWindow extends JFrame{
-	
-	private final static Logger logger = Logger.getLogger(MainWindow.class .getName()); 
-	
+	private final static Logger logger = Logger.getLogger(MainWindow.class
+			.getName());
+
 	private static final int LOG_SIZE_IN_BYTES = 20000;
 	private static final int LOG_ROTATION_COUNT = 100;
-	
+
 	private static final String APP_NAME = "Gifty";
 	private static final String APP_VERSION = "0.1.00001";
-	
+
 	private JPanel mainPanel;
-	
+
 	private Action openFileAction;
 	private Action saveFileAction;
 	private Action clearQuestionAction;
 	private Action newQuestionAction;
-	
-	JTabbedPane tabbedPane;
+
+	private JTabbedPane tabbedPane;
+	private StatusBar statusBar;
+	private JToolBar toolbar;
+
+	private FileManager fileManager;
+	private ArrayList<String> questions;
 
 	public MainWindow() {
+		fileManager = new FileManager();
+		questions = new ArrayList<String>();
 		initLogging();
 		initUI();
 	}
-	
-	
+
 	public void initUI() {
 		setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-		
-		mainPanel = new JPanel(new MigLayout("", "grow,fill",
-				"[][grow,fill, push]"));
 
-		openFileAction = new OpenFileAction("Open File", createIcon("Open"),
-				"Open an existing GIFT file", new Integer(KeyEvent.VK_O));
-		
-		saveFileAction = new SaveFileAction("Save File", createIcon("Save"),
-				"Save current file GIFT question file", new Integer(
-						KeyEvent.VK_S));
-		
+		statusBar = new StatusBar();
+		statusBar.setStatus("No File open");
+
+		mainPanel = new JPanel(new MigLayout("", "grow,fill",
+				"[][grow,fill, push][]"));
+
+		openFileAction = new OpenFileAction("Open File",
+				createIcon("Open_24x24"), "Open an existing GIFT file",
+				KeyStroke.getKeyStroke("ctrl O"));
+
+		saveFileAction = new SaveFileAction("Save File",
+				createIcon("Save_24x24"),
+				"Save current file GIFT question file",
+				KeyStroke.getKeyStroke("ctrl S"));
+
 		clearQuestionAction = new ClearQuestionAction("Clear Question",
-				createIcon("Delete"), "Clear Question",
-				new Integer(KeyEvent.VK_S));
+				createIcon("Delete_24x24"), "Clear Question",
+				KeyStroke.getKeyStroke('K', KeyEvent.CTRL_MASK));
 
 		newQuestionAction = new NewQuestionAction("New Question",
-				createIcon("Check"), "New Question",
-				new Integer(KeyEvent.VK_S));
+				createIcon("Check_24x24"), "New Question",
+				KeyStroke.getKeyStroke('F', KeyEvent.CTRL_MASK));
+
+		saveFileAction.setEnabled(false);
 
 		createMenubar();
-		JToolBar toolbar = createToolbar();
+		toolbar = createToolbar();
 		JTabbedPane tabbedPane = createTabbedpane();
+		tabbedPane.setBorder(new BevelBorder(BevelBorder.LOWERED));
 
-		mainPanel.add(toolbar, "grow, wrap");
-		mainPanel.add(tabbedPane, "grow, push");
+		mainPanel.add(toolbar, "growx,  wrap");
+		mainPanel.add(tabbedPane, "grow, wrap");
+		mainPanel.add(statusBar, "growx");
 		setContentPane(mainPanel);
 
 		// Maximise the frame
@@ -108,9 +132,16 @@ public class MainWindow extends JFrame{
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
 		Dimension dimension = toolkit.getScreenSize();
 		setSize(dimension);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent ev) {
+				fileManager.closeFile();
+				System.exit(0);
+			}
+		});
 
 	}
-	
 
 	public void createMenubar() {
 		JMenuBar menuBar = new JMenuBar();
@@ -119,56 +150,57 @@ public class MainWindow extends JFrame{
 		JMenuItem openFileMenuItem = new JMenuItem(openFileAction);
 		saveFileMenuItem.setIcon(null);
 		openFileMenuItem.setIcon(null);
-		
+
 		fileMenu.add(saveFileMenuItem);
 		fileMenu.add(openFileMenuItem);
 		menuBar.add(fileMenu);
-		
+
 		setJMenuBar(menuBar);
-		
+
 	}
-	
+
 	public JToolBar createToolbar() {
 		JToolBar toolBar = new JToolBar("");
 		toolBar.setFloatable(false);
-        toolBar.setRollover(true);
+		toolBar.setRollover(true);
 
-        JButton openFileButton = new JButton(openFileAction);
-        JButton saveFileButton = new JButton(saveFileAction);
-        JButton clearQuestionButton = new JButton(clearQuestionAction);
-        JButton saveQuestionButton = new JButton(newQuestionAction);
-        
-        openFileButton.setText(""); 
-        saveFileButton.setText("");  
-        clearQuestionButton.setText(""); 
-        saveQuestionButton .setText(""); 
+		JButton openFileButton = new JButton(openFileAction);
+		JButton saveFileButton = new JButton(saveFileAction);
+		JButton clearQuestionButton = new JButton(clearQuestionAction);
+		JButton saveQuestionButton = new JButton(newQuestionAction);
 
-        
-        toolBar.add(openFileButton);
-        toolBar.add(saveFileButton);
-        toolBar.add(saveQuestionButton);
-        toolBar.add(clearQuestionButton);
-              
-        return toolBar;
+		openFileButton.setText("");
+		saveFileButton.setText("");
+		clearQuestionButton.setText("");
+		saveQuestionButton.setText("");
+
+		toolBar.add(openFileButton);
+		toolBar.add(saveFileButton);
+		toolBar.add(saveQuestionButton);
+		toolBar.add(clearQuestionButton);
+
+		return toolBar;
 	}
-	
+
 	public JTabbedPane createTabbedpane() {
 
 		tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
-		tabbedPane.addTab( "True/False", new TrueFalseQuestionPanel() );
-		tabbedPane.addTab( "Multiple Choice", new JPanel() );
-		tabbedPane.addTab( "Essay", new JPanel()  );
-		tabbedPane.addTab( "Fill in the Blank", new JPanel()  );
-		tabbedPane.addTab( "Matching", new JPanel()  );
-		tabbedPane.addTab( "Math range", new JPanel()  );
-		tabbedPane.addTab( "Math range with interval end points", new JPanel()  );
-		tabbedPane.addTab( "Multiple numeric answers with partial credit", new JPanel()  );
+		tabbedPane.addTab("True/False", new TrueFalseQuestionPanel());
+		tabbedPane.addTab("Multiple Choice", new JPanel());
+		tabbedPane.addTab("Essay", new JPanel());
+		tabbedPane.addTab("Fill in the Blank", new JPanel());
+		tabbedPane.addTab("Matching", new JPanel());
+		tabbedPane.addTab("Math range", new JPanel());
+		tabbedPane.addTab("Math range with interval end points", new JPanel());
+		tabbedPane.addTab("Multiple numeric answers with partial credit",
+				new JPanel());
 
-		return tabbedPane;	
+		return tabbedPane;
 	}
-	
+
 	private Icon createIcon(String imageName) {
-		String imageLocation = "/resources/must-have-icon-set-png/png/" + imageName+ ".png";
+		String imageLocation = "/resources/must-have-icon-set-png/png/"
+				+ imageName + ".png";
 		java.net.URL imageURL = getClass().getResource(imageLocation);
 
 		if (imageURL == null) {
@@ -180,12 +212,12 @@ public class MainWindow extends JFrame{
 
 	}
 
-	
-	public void  initLogging() {
+	public void initLogging() {
 		logger.setLevel(Level.FINEST);
 		Handler handler;
 		try {
-			handler = new FileHandler(APP_NAME+"_V"+APP_VERSION+"_%u-%g.log", LOG_SIZE_IN_BYTES, LOG_ROTATION_COUNT);
+			handler = new FileHandler(APP_NAME + "_V" + APP_VERSION
+					+ "_%u-%g.log", LOG_SIZE_IN_BYTES, LOG_ROTATION_COUNT);
 			Logger.getLogger("").addHandler(handler);
 		} catch (SecurityException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
@@ -193,18 +225,16 @@ public class MainWindow extends JFrame{
 			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
-	
-	
+
 	public static void main(String[] args) {
-		SwingUtilities.invokeLater( new Runnable() {
+		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				MainWindow mainWindow = new MainWindow();
 				mainWindow.setVisible(true);
 			}
 		});
 	}
-	
-	
+
 	private void setLookAndFeel(String lookAndFeel) {
 		try {
 			UIManager.setLookAndFeel(lookAndFeel);
@@ -218,95 +248,162 @@ public class MainWindow extends JFrame{
 			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
-	
-	
-	private void newQuestion() {
-		IQuestion questionPanel = (IQuestion)tabbedPane.getComponent(0);
 
-		String formattedQuestion = questionPanel.getFormattedQuestion();
-		
-		if(formattedQuestion.compareTo("") == 0) {
-			return;
-		}
-		System.out.println("Got formatted question " + formattedQuestion);
-	}
-	
+	// ///////////////////////////////////////////////////
+	// actions
 
-	private void clearQuestion() {
-		IQuestion questionPanel = (IQuestion)tabbedPane.getComponent(0);
-
-		questionPanel.clearQuestion();
-	}
-
-	
-	/////////////////////////////////////////////////////
-	//actions
-	
-	
 	class SaveFileAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
 		public SaveFileAction(String text, Icon icon, String desc,
-				Integer mnemonic) {
+				KeyStroke accelerator) {
 			super(text, icon);
 			putValue(SHORT_DESCRIPTION, desc);
-			putValue(MNEMONIC_KEY, mnemonic);
-		}
+			putValue(ACCELERATOR_KEY, accelerator);
 
+		}
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			System.out.println("saveFileaction...");
-			
-		}
 
+			if (questions.isEmpty()) {
+				return;
+			}
+
+			if (!fileManager.hasOpenFile()) {
+
+				JFileChooser fileChooser = new JFileChooser();
+				int retVal = fileChooser.showSaveDialog(MainWindow.this);
+
+				// get the filepath and try and open the file
+				if (retVal == JFileChooser.APPROVE_OPTION) {
+					File file = fileChooser.getSelectedFile();
+
+					boolean ok = fileManager.addFileAndOpen(file);
+
+					if (!ok) {
+						DialogUtil.showErrorDialog(MainWindow.this,
+								"File error", "Error creating file");
+
+						return;
+					}
+					statusBar.setStatus("File " + fileManager.getOpenFilepath()
+							+ " open for writing...");
+				}
+			}
+
+			ArrayList<String> questionsCopy = questions;
+			questions = new ArrayList<String>();
+			for (String question : questionsCopy) {
+				fileManager.appendStringToFile(question + "\n\n");
+				System.out.println(question);
+			}
+			fileManager.saveFile();
+			saveFileAction.setEnabled(false);
+		}
 	}
-	
+
 	class OpenFileAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
 		public OpenFileAction(String text, Icon icon, String desc,
-				Integer mnemonic) {
+				KeyStroke accelerator) {
 			super(text, icon);
 			putValue(SHORT_DESCRIPTION, desc);
-			putValue(MNEMONIC_KEY, mnemonic);
+			putValue(ACCELERATOR_KEY, accelerator);
 		}
-
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			System.out.println("openFileaction...");
-			
-		}
 
+			if (fileManager.hasOpenFile()) {
+				boolean ok = DialogUtil
+						.showOkCancelWarningDialog(MainWindow.this,
+								"Open file ?",
+								"Opening a new file will close\nthe current file that is open!");
+				if (!ok) {
+					return;
+				}
+			}
+
+			JFileChooser fileChooser = new JFileChooser();
+			int retVal = fileChooser.showOpenDialog(null);
+
+			if (retVal == JFileChooser.APPROVE_OPTION) {
+				File file = fileChooser.getSelectedFile();
+
+				boolean ok = fileManager.addFileAndOpen(file);
+
+				if (!ok) {
+					DialogUtil
+							.showErrorDialog(MainWindow.this, "File Error",
+									"Error opening file\nEnsure the file is not open in another application");
+				}
+			}
+
+			statusBar.setStatus("File " + fileManager.getOpenFilepath()
+					+ " open for writing...");
+		}
 	}
-	
+
 	class NewQuestionAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
 		public NewQuestionAction(String text, Icon icon, String desc,
-				Integer mnemonic) {
+				KeyStroke accelerator) {
 			super(text, icon);
 			putValue(SHORT_DESCRIPTION, desc);
-			putValue(MNEMONIC_KEY, mnemonic);
+			putValue(ACCELERATOR_KEY, accelerator);
 		}
-
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			newQuestion();		
+			IQuestion questionPanel = (IQuestion) tabbedPane.getComponent(0);
+
+			String formattedQuestion = questionPanel.getFormattedQuestion();
+
+			if (formattedQuestion.compareTo("") == 0) {
+				return;
+			}
+			questions.add(formattedQuestion);
+			saveFileAction.setEnabled(true);
 		}
 	}
-	
-	
+
 	class ClearQuestionAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
 		public ClearQuestionAction(String text, Icon icon, String desc,
-				Integer mnemonic) {
+				KeyStroke accelerator) {
 			super(text, icon);
 			putValue(SHORT_DESCRIPTION, desc);
-			putValue(MNEMONIC_KEY, mnemonic);
+			putValue(ACCELERATOR_KEY, accelerator);
 		}
-
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			clearQuestion();
+			IQuestion questionPanel = (IQuestion) tabbedPane.getComponent(0);
+
+			questionPanel.clearQuestion();
 
 		}
 
+	}
+
+	public class ExitAction extends AbstractAction {
+
+		public ExitAction() {
+			super("Exit", null);
+			putValue(SHORT_DESCRIPTION, "Exit the application");
+
+		}
+
+		public void actionPerformed(ActionEvent aActionEvent) {
+			fileManager.closeFile();
+			System.exit(0);
+		}
 	}
 }

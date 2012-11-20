@@ -1,18 +1,16 @@
 package gifty.gui;
 
+import gifty.core.GIFTQuestionFormatter;
+import gifty.core.IQuestion;
+
 import java.util.logging.Logger;
 
-import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
-
-import gifty.core.GIFTQuestionFormatter;
-import gifty.core.IQuestion;
 
 public class TrueFalseQuestionPanel extends JPanel implements IQuestion {
 
@@ -60,8 +58,8 @@ public class TrueFalseQuestionPanel extends JPanel implements IQuestion {
 		boolean isTrue = trueFalseRbgPnl.isButtonSelected(TRUE_BUTTON_NAME);
 
 		if (question.compareTo("") == 0) {
-			DialogUtil.showErrorDialog(this,
-					"You need a question body to create a question!");
+			DialogUtil.showErrorDialog(this, "Empty field error",
+					"Your question needs body to create the question!");
 			return "";
 		}
 
@@ -75,7 +73,7 @@ public class TrueFalseQuestionPanel extends JPanel implements IQuestion {
 		questionTitleTextfield.setText("");
 		questionTextarea.setText("");
 		trueFalseRbgPnl.setSelectedButtonByName(TRUE_BUTTON_NAME);
-		
+
 	}
 
 }
