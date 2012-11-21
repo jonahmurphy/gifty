@@ -84,6 +84,9 @@ public class MainWindow extends JFrame {
 
 	private NewAction newAction;
 
+	/**
+	 * Start the app with no file open
+	 */
 	public MainWindow() {
 		fileManager = new FileManager();
 		questions = new ArrayList<String>();
@@ -91,10 +94,15 @@ public class MainWindow extends JFrame {
 		initUI();
 	}
 
+	/**
+	 * Start the app with a file that will be appended to..
+	 * @param filepath
+	 */
 	public MainWindow(String filepath) {
 		this();
 
-		boolean ok = fileManager.addFileAndOpen(new File(filepath));
+		//open the file to append to ...
+		boolean ok = fileManager.addFileAndOpen(new File(filepath), true);
 
 		if (!ok) {
 			DialogUtil.showErrorDialog(MainWindow.this, "File error",
@@ -416,7 +424,8 @@ public class MainWindow extends JFrame {
 				if (retVal == JFileChooser.APPROVE_OPTION) {
 					File file = fileChooser.getSelectedFile();
 
-					boolean ok = fileManager.addFileAndOpen(file);
+					//overwrite the file if it exists already
+					boolean ok = fileManager.addFileAndOpen(file, false);
 
 					if (!ok) {
 						DialogUtil.showErrorDialog(MainWindow.this,

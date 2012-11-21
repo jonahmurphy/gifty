@@ -29,6 +29,7 @@ public class FileManager {
 		// TODO Auto-generated constructor stub
 	}
 
+	
 	/**
 	 * If the FileManager is currently managing a file it closes it before
 	 * creating the new file
@@ -38,7 +39,7 @@ public class FileManager {
 	 * @param filepath
 	 * @return
 	 */
-	public boolean addFileAndOpen(File aFile) {
+	public boolean addFileAndOpen(File aFile, boolean append) {
 		closeFile();
 
 		file = aFile;
@@ -55,7 +56,7 @@ public class FileManager {
 
 		// setup the printwriter
 		try {
-			writer = new PrintWriter(new BufferedWriter(new FileWriter(file, true)), true);
+			writer = new PrintWriter(new BufferedWriter(new FileWriter(file, append)), append);
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 			return false;
@@ -68,7 +69,7 @@ public class FileManager {
 		writer.flush();
 		writer.close();
 		
-		return addFileAndOpen(file);
+		return addFileAndOpen(file, true);
 
 	}
 

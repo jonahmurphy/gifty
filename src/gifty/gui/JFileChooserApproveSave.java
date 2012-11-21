@@ -14,19 +14,26 @@ class JFileChooserApproveSave extends JFileChooser {
 	public void approveSelection() {
 		File file = getSelectedFile();
 		if (file.exists() && getDialogType() == SAVE_DIALOG) {
+			
 			int result = JOptionPane.showConfirmDialog(this,
 					"The file exists, overwrite?", "Existing file",
 					JOptionPane.YES_NO_CANCEL_OPTION);
+			
 			switch (result) {
 			case JOptionPane.YES_OPTION:
 				super.approveSelection();
-				return;
+				break;
 			case JOptionPane.CANCEL_OPTION:
 				cancelSelection();
-				return;
+				break;
 			default:
-				return;
+				break;
 			}
+		}else {
+			
 		}
+		
+		super.approveSelection();
+		
 	}
 }
