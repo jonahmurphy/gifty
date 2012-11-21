@@ -241,11 +241,13 @@ public class MainWindow extends JFrame {
 	public JTabbedPane createTabbedpane() {
 
 		tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
+		tabbedPane.addTab("Matching", new MatchingQuestionPanel());
+		
 		tabbedPane.addTab("True / False", new TrueFalseQuestionPanel());
 		tabbedPane.addTab("Multiple Choice", new JPanel());
 		tabbedPane.addTab("Essay", new EssayQuestionPanel());
 		tabbedPane.addTab("Fill in the Blank", new JPanel());
-		tabbedPane.addTab("Matching", new JPanel());
+		
 		tabbedPane.addTab("Math range", new JPanel());
 		tabbedPane.addTab("Math range with interval end points", new JPanel());
 		tabbedPane.addTab("Multiple numeric answers with partial credit",
@@ -348,8 +350,8 @@ public class MainWindow extends JFrame {
 	}
 
 	/**
-	 * dirty and not so roboust hack to see if a Process is still running N.B
-	 * cannot be relied on!!
+	 * Dirty and not so roboust hack to see if a Process is still running 
+	 * N.B cannot be relied on!!
 	 * 
 	 * @param process
 	 * @return
@@ -490,7 +492,7 @@ public class MainWindow extends JFrame {
 			ArrayList<String> questionsCopy = questions;
 			questions = new ArrayList<String>();
 			for (String question : questionsCopy) {
-				fileManager.appendStringToFile(question + "\n\n");
+				fileManager.appendStringToFile(question);
 			}
 			fileManager.saveFile();
 			saveFileAction.setEnabled(false);

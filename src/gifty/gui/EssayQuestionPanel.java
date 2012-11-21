@@ -19,7 +19,7 @@ public class EssayQuestionPanel extends JPanel implements IQuestion {
 
 	private GIFTQuestionFormatter formatter;
 	private JTextField questionTitleTextfield;
-	private JTextArea questionTextarea;
+	private ScrollableTextArea questionTextarea;
 
 
 	public EssayQuestionPanel() {
@@ -32,7 +32,7 @@ public class EssayQuestionPanel extends JPanel implements IQuestion {
 		questionTitleTextfield = new JTextField(20);
 
 		JLabel questionLbl = new JLabel("Question");
-		questionTextarea = new JTextArea();
+		questionTextarea = new ScrollableTextArea();
 
 		setLayout(new MigLayout("", "[][grow]", "[][grow][]"));
 

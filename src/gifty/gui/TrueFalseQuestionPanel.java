@@ -13,13 +13,16 @@ import javax.swing.JTextField;
 import net.miginfocom.swing.MigLayout;
 
 public class TrueFalseQuestionPanel extends JPanel implements IQuestion {
+	
+	private static final long serialVersionUID = 1L;
 
 	private final static Logger logger = Logger
 			.getLogger(TrueFalseQuestionPanel.class.getName());
 
 	private GIFTQuestionFormatter formatter;
+	
 	private JTextField questionTitleTextfield;
-	private JTextArea questionTextarea;
+	private ScrollableTextArea questionTextarea;
 	private RadioButtonGroupPanel trueFalseRbgPnl;
 
 	final private static String TRUE_BUTTON_NAME = "True";
@@ -35,7 +38,7 @@ public class TrueFalseQuestionPanel extends JPanel implements IQuestion {
 		questionTitleTextfield = new JTextField(20);
 
 		JLabel questionLbl = new JLabel("Question");
-		questionTextarea = new JTextArea();
+		questionTextarea = new ScrollableTextArea();
 
 		trueFalseRbgPnl = new RadioButtonGroupPanel(new String[] {
 				TRUE_BUTTON_NAME, FALSE_BUTTON_NAME }, "True");

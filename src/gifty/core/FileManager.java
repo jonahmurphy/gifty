@@ -85,7 +85,6 @@ public class FileManager {
 			logger.info("Could not write to file...");
 			return false;
 		}
-		logger.info("wrote to file");
 		writer.println(string);
 		return true;
 	}
