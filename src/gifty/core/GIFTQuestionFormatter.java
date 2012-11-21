@@ -20,7 +20,7 @@ package gifty.core;
 import java.util.ArrayList;
 
 /**
- * TODO: write method to escape any of the GIFT special characters ~ = # { }
+ * 
  * 
  * @author Jonah
  * 
@@ -29,6 +29,7 @@ import java.util.ArrayList;
 public class GIFTQuestionFormatter {
 
 	private StringBuilder formattedQuestions;
+	private String[] SPECIAL_CHARS = {"~", "=",  "#", "{",  "}" };
 
 	public GIFTQuestionFormatter() {
 		formattedQuestions = new StringBuilder();
@@ -36,6 +37,8 @@ public class GIFTQuestionFormatter {
 
 	public String formatTrueFalseQuestion(String questionTitle,
 			String question, boolean questionIsTrue) {
+		
+		question = escapeSpecialChars(question);
 
 		String formattedQuestion = String.format("%s %s %s\n\n",
 				formatTitle(questionTitle), question, questionIsTrue ? "{T}"
@@ -46,6 +49,8 @@ public class GIFTQuestionFormatter {
 
 	public String formatEssayQuestion(String questionTitle, String question) {
 
+		question = escapeSpecialChars(question);
+		
 		String formattedQuestion = String.format("%s %s %s\n\n",
 				formatTitle(questionTitle), question, "{}");
 
@@ -68,7 +73,7 @@ public class GIFTQuestionFormatter {
 			questionTitle = "::" + questionTitle + "::";
 		}
 
-		return questionTitle.trim();
+		return escapeSpecialChars( questionTitle.trim() );
 	}
 	
 	private String formatMatchPairs(ArrayList<String[]> matchPairs) {
@@ -81,6 +86,15 @@ public class GIFTQuestionFormatter {
 			
 			sb.append(String.format(" =%s -> %s ", matchPair[0], matchPair[1]));		
 		}
-		return sb.toString();
+		return escapeSpecialChars( sb.toString() );
+	}
+	
+	private String escapeSpecialChars(String str) {
+		
+		for(String specialChar : SPECIAL_CHARS ) {
+			str = str.replace(specialChar, '\\'+specialChar);
+		}
+		
+		return str;
 	}
 }
