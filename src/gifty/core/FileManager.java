@@ -1,6 +1,6 @@
 package gifty.core;
 
-import gifty.gui.MainWindow;
+import gifty.gui.GiftyApp;
 
 import java.io.BufferedWriter;
 import java.io.File;
