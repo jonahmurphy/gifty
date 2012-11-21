@@ -246,9 +246,9 @@ public class GiftyApp extends JFrame {
 		tabbedPane.addTab("Fill in the Blank", new JPanel());	
 		tabbedPane.addTab("Math range", new JPanel());
 		tabbedPane.addTab("Math range with interval end points", new JPanel());
-		tabbedPane.addTab("Multiple numeric answers with partial credit", new JPanel());
+		tabbedPane.addTab("Numeric", new JPanel());
 	
-		
+		tabbedPane.addTab("Short Answer", new ShortAnswerQuestionPanel());
 		tabbedPane.addTab("True / False", new TrueFalseQuestionPanel());
 		tabbedPane.addTab("Matching", new MatchingQuestionPanel());
 		tabbedPane.addTab("Essay", new EssayQuestionPanel());
@@ -494,7 +494,7 @@ public class GiftyApp extends JFrame {
 			ArrayList<String> questionsCopy = questions;
 			questions = new ArrayList<String>();
 			for (String question : questionsCopy) {
-				fileManager.appendStringToFile(question);
+				fileManager.appendStringToFile(question+"\n");
 			}
 			fileManager.saveFile();
 			saveFileAction.setEnabled(false);

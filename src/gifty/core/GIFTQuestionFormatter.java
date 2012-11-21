@@ -40,9 +40,22 @@ public class GIFTQuestionFormatter {
 		
 		question = escapeSpecialChars(question);
 
-		String formattedQuestion = String.format("%s %s %s\n\n",
+		String formattedQuestion = String.format("%s %s %s\n",
 				formatTitle(questionTitle), question, questionIsTrue ? "{T}"
 						: "{F}");
+
+		return formattedQuestion;
+	}
+	
+	public String shortAnswerQuestion(String questionTitle, String question,
+			String answer) {
+		
+		question = escapeSpecialChars(question);
+		answer = escapeSpecialChars(answer);
+		
+		String formattedQuestion = String.format("%s %s {=%s}\n",
+				formatTitle(questionTitle), question, answer);
+		
 
 		return formattedQuestion;
 	}
@@ -51,8 +64,8 @@ public class GIFTQuestionFormatter {
 
 		question = escapeSpecialChars(question);
 		
-		String formattedQuestion = String.format("%s %s %s\n\n",
-				formatTitle(questionTitle), question, "{}");
+		String formattedQuestion = String.format("%s %s %s {}\n",
+				formatTitle(questionTitle), question);
 
 		return formattedQuestion;
 	}
@@ -60,17 +73,17 @@ public class GIFTQuestionFormatter {
 	public String formatMatchQuestion(String questionTitle, String question,
 			ArrayList<String[]> matchPairs) {
 
-		String formattedQuestion = String.format("%s %s %s\n\n",
+		String formattedQuestion = String.format("%s %s {\n %s }\n\n",
 				formatTitle(questionTitle), 
 				question, 
-				"{\n "+ formatMatchPairs(matchPairs) + "\n}");
+				formatMatchPairs(matchPairs));
 
 		return formattedQuestion;
 	}
 	
 	private String formatTitle(String questionTitle) {
 		if (!questionTitle.isEmpty()) {
-			questionTitle = "::" + questionTitle + "::";
+			questionTitle = String.format("::%s::",  questionTitle);
 		}
 
 		return escapeSpecialChars( questionTitle.trim() );
@@ -78,13 +91,13 @@ public class GIFTQuestionFormatter {
 	
 	private String formatMatchPairs(ArrayList<String[]> matchPairs) {
 		StringBuilder sb = new StringBuilder();
-		
-		//ignore mal formed questions
+			
 		for(String[] matchPair : matchPairs) {
+			//ignore mal formed questions
 			if(matchPair[0].isEmpty() || matchPair[1].isEmpty())
 				continue;
 			
-			sb.append(String.format(" =%s -> %s ", matchPair[0], matchPair[1]));		
+			sb.append(String.format(" =%s -> %s \n", matchPair[0], matchPair[1]));		
 		}
 		return escapeSpecialChars( sb.toString() );
 	}
@@ -97,4 +110,6 @@ public class GIFTQuestionFormatter {
 		
 		return str;
 	}
+
+
 }
