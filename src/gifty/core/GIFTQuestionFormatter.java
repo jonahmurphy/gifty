@@ -28,12 +28,17 @@ public class GIFTQuestionFormatter {
 	public String formatTrueFalseQuestion(String questionTitle,
 			String question, boolean questionIsTrue) {
 
-		String fomattedQuestion = String.format("::%s:: %s %s\n\n",
+		String formattedQuestion = String.format("::%s:: %s %s\n\n",
 				questionTitle, question, questionIsTrue ? "{T}" : "{F}");
 
 
-		return fomattedQuestion;
+		return formattedQuestion;
 	}
 
+	public String formatEssayQuestion(String questionTitle, String question) {
+		String formattedQuestion = String.format("::%s:: %s %s\n\n",
+				questionTitle, question, "{}");
 
+		return formattedQuestion;
+	}
 }

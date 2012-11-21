@@ -12,7 +12,7 @@ import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
 
-public class TrueFalseQuestionPanel extends JPanel implements IQuestion {
+public class EssayQuestionPanel extends JPanel implements IQuestion {
 
 	private final static Logger logger = Logger
 			.getLogger(TrueFalseQuestionPanel.class.getName());
@@ -20,12 +20,9 @@ public class TrueFalseQuestionPanel extends JPanel implements IQuestion {
 	private GIFTQuestionFormatter formatter;
 	private JTextField questionTitleTextfield;
 	private JTextArea questionTextarea;
-	private RadioButtonGroupPanel trueFalseRbgPnl;
 
-	final private static String TRUE_BUTTON_NAME = "True";
-	final private static String FALSE_BUTTON_NAME = "False";
 
-	public TrueFalseQuestionPanel() {
+	public EssayQuestionPanel() {
 		formatter = new GIFTQuestionFormatter();
 		initLayout();
 	}
@@ -37,8 +34,6 @@ public class TrueFalseQuestionPanel extends JPanel implements IQuestion {
 		JLabel questionLbl = new JLabel("Question");
 		questionTextarea = new JTextArea();
 
-		trueFalseRbgPnl = new RadioButtonGroupPanel(new String[] {
-				TRUE_BUTTON_NAME, FALSE_BUTTON_NAME }, "True");
 		setLayout(new MigLayout("", "[][grow]", "[][grow][]"));
 
 		add(questionTitleLbl, "align right");
@@ -46,24 +41,20 @@ public class TrueFalseQuestionPanel extends JPanel implements IQuestion {
 
 		add(questionLbl, "align right top");
 		add(questionTextarea, "grow, wrap");
-
-		add(new JLabel("True / False"), "align right top");
-		add(trueFalseRbgPnl, "align left");
 	}
 
 	@Override
 	public String getFormattedQuestion() {
 		String questionTitle = questionTitleTextfield.getText();
 		String question = questionTextarea.getText();
-		boolean isTrue = trueFalseRbgPnl.isButtonSelected(TRUE_BUTTON_NAME);
 
 		if (question.compareTo("") == 0) {
 			DialogUtils.showEmptyQuestionBodyWarning(this);
 			return "";
 		}
 
-		String formattedQuestion = formatter.formatTrueFalseQuestion(
-				questionTitle, question, isTrue);
+		String formattedQuestion = formatter.formatEssayQuestion(
+				questionTitle, question);
 		return formattedQuestion;
 	}
 
@@ -71,8 +62,6 @@ public class TrueFalseQuestionPanel extends JPanel implements IQuestion {
 	public void clearQuestion() {
 		questionTitleTextfield.setText("");
 		questionTextarea.setText("");
-		trueFalseRbgPnl.setSelectedButtonByName(TRUE_BUTTON_NAME);
-
 	}
 
 }

@@ -60,7 +60,7 @@ public class MainWindow extends JFrame {
 
 	private final static Logger logger = Logger.getLogger(MainWindow.class
 			.getName());
-	
+
 	private final static String ICONS_PATH = "/resources/must-have-icon-set-png/png/";
 
 	private static final int LOG_SIZE_IN_BYTES = 20000;
@@ -77,7 +77,6 @@ public class MainWindow extends JFrame {
 	private Action saveFileAsAction;
 	private Action clearQuestionAction;
 	private Action newQuestionAction;
-	
 
 	private JTabbedPane tabbedPane;
 	private StatusBar statusBar;
@@ -85,8 +84,6 @@ public class MainWindow extends JFrame {
 
 	private FileManager fileManager;
 	private ArrayList<String> questions;
-
-
 
 	/**
 	 * Start the app with no file open
@@ -110,7 +107,7 @@ public class MainWindow extends JFrame {
 		boolean ok = fileManager.addFileAndOpen(new File(filepath), true);
 
 		if (!ok) {
-			DialogUtil.showErrorDialog(MainWindow.this, "File error",
+			DialogUtils.showErrorDialog(MainWindow.this, "File error",
 					"Error creating file");
 
 			return;
@@ -145,7 +142,7 @@ public class MainWindow extends JFrame {
 
 	public void initUI() {
 		setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-		//setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+		// setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 
 		statusBar = new StatusBar();
 		statusBar.setStatus("No File open");
@@ -230,7 +227,7 @@ public class MainWindow extends JFrame {
 		toolBar.setRollover(true);
 
 		Action[] actions = { newAction, openFileAction, saveFileAction,
-				saveFileAsAction , newQuestionAction, clearQuestionAction};
+				saveFileAsAction, newQuestionAction, clearQuestionAction };
 
 		for (Action action : actions) {
 			JButton button = new JButton(action);
@@ -246,7 +243,7 @@ public class MainWindow extends JFrame {
 		tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
 		tabbedPane.addTab("True / False", new TrueFalseQuestionPanel());
 		tabbedPane.addTab("Multiple Choice", new JPanel());
-		tabbedPane.addTab("Essay", new JPanel());
+		tabbedPane.addTab("Essay", new EssayQuestionPanel());
 		tabbedPane.addTab("Fill in the Blank", new JPanel());
 		tabbedPane.addTab("Matching", new JPanel());
 		tabbedPane.addTab("Math range", new JPanel());
@@ -326,7 +323,7 @@ public class MainWindow extends JFrame {
 		if (tryStartProcess(pb)) {
 			// return;
 		} else {
-			DialogUtil.showErrorDialog(MainWindow.this,
+			DialogUtils.showErrorDialog(MainWindow.this,
 					"Error opening instance!", "Could not find jar file!\n");
 
 		}
@@ -413,7 +410,6 @@ public class MainWindow extends JFrame {
 				return;
 			}
 
-
 			JFileChooser fileChooser = new JFileChooserApproveSave();
 			int retVal = fileChooser.showSaveDialog(MainWindow.this);
 
@@ -425,8 +421,8 @@ public class MainWindow extends JFrame {
 				boolean ok = fileManager.addFileAndOpen(file, false);
 
 				if (!ok) {
-					DialogUtil.showErrorDialog(MainWindow.this,
-							"File error", "Error creating file");
+					DialogUtils.showErrorDialog(MainWindow.this, "File error",
+							"Error creating file");
 
 					return;
 				}
@@ -435,7 +431,6 @@ public class MainWindow extends JFrame {
 			} else {
 				return;
 			}
-
 
 			ArrayList<String> questionsCopy = questions;
 			questions = new ArrayList<String>();
@@ -480,7 +475,7 @@ public class MainWindow extends JFrame {
 					boolean ok = fileManager.addFileAndOpen(file, false);
 
 					if (!ok) {
-						DialogUtil.showErrorDialog(MainWindow.this,
+						DialogUtils.showErrorDialog(MainWindow.this,
 								"File error", "Error creating file");
 
 						return;
@@ -526,7 +521,7 @@ public class MainWindow extends JFrame {
 
 				if (!file.exists()) {
 					logger.log(Level.SEVERE, "File doesn't exist!!");
-					DialogUtil.showErrorDialog(MainWindow.this, "File Error ",
+					DialogUtils.showErrorDialog(MainWindow.this, "File Error ",
 							"Error finding file!");
 
 					return;
@@ -550,7 +545,8 @@ public class MainWindow extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			IQuestion questionPanel = (IQuestion) tabbedPane.getComponent(0);
+			IQuestion questionPanel = (IQuestion) tabbedPane
+					.getComponentAt(tabbedPane.getSelectedIndex());
 
 			String formattedQuestion = questionPanel.getFormattedQuestion();
 
@@ -576,7 +572,8 @@ public class MainWindow extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			IQuestion questionPanel = (IQuestion) tabbedPane.getComponent(0);
+			IQuestion questionPanel = (IQuestion) tabbedPane
+					.getComponentAt(tabbedPane.getSelectedIndex());
 
 			questionPanel.clearQuestion();
 		}
