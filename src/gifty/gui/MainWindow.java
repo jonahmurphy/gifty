@@ -45,6 +45,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
@@ -81,7 +82,7 @@ public class MainWindow extends JFrame {
 	private FileManager fileManager;
 	private ArrayList<String> questions;
 
-	private NewFileAction newFileAction;
+	private NewAction newFileAction;
 
 	public MainWindow() {
 		fileManager = new FileManager();
@@ -138,7 +139,7 @@ public class MainWindow extends JFrame {
 		mainPanel = new JPanel(new MigLayout("", "grow,fill",
 				"[][grow,fill, push][]"));
 
-		newFileAction = new NewFileAction("New File", createIcon("New_24x24"),
+		newFileAction = new NewAction("New File", createIcon("New_24x24"),
 				"Open an existing GIFT file", KeyStroke.getKeyStroke("ctrl N"));
 
 		openFileAction = new OpenFileAction("Open File",
@@ -286,10 +287,23 @@ public class MainWindow extends JFrame {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
+	
+	
+	private void startNewAppInstance() {
+		ProcessBuilder pb = new ProcessBuilder("java", "-jar", "*.jar");
+		startNewAppInstance(pb);
 
-	public void startNewAppInstance(String filepath) {
+	}
+	
+	private void startNewAppInstance(String filepath) {
 		ProcessBuilder pb = new ProcessBuilder("java", "-jar", "*.jar",
 				filepath);
+		
+		startNewAppInstance(pb);
+		
+	}
+	
+	private void startNewAppInstance(ProcessBuilder pb) {
 		// if running from eclipse...
 		File eclipse = new File((new File(".")).getAbsoluteFile(), "build");
 		pb.directory(eclipse);
@@ -306,9 +320,10 @@ public class MainWindow extends JFrame {
 			DialogUtil.showErrorDialog(MainWindow.this,
 					"Error opening instance!", "Could not find jar file!\n");
 
-		}
-
+		}	
 	}
+
+
 
 	/**
 	 * Try to start the process belonging to the processBuilder
@@ -350,15 +365,40 @@ public class MainWindow extends JFrame {
 
 		return false;
 	}
+	
+	class JFileChooserApprove extends JFileChooser {
+		@Override
+		public void approveSelection() {
+			File f = getSelectedFile();
+			if (f.exists() && getDialogType() == SAVE_DIALOG) {
+				int result = JOptionPane.showConfirmDialog(this,
+						"The file exists, overwrite?", "Existing file",
+						JOptionPane.YES_NO_CANCEL_OPTION);
+				switch (result) {
+				case JOptionPane.YES_OPTION:
+					super.approveSelection();
+					return;
+				case JOptionPane.NO_OPTION:
+					return;
+				case JOptionPane.CLOSED_OPTION:
+					return;
+				case JOptionPane.CANCEL_OPTION:
+					cancelSelection();
+					return;
+				}
+			}
+		}
+	}
+
 
 	// ///////////////////////////////////////////////////
 	// actions
 
-	class NewFileAction extends AbstractAction {
+	class NewAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
 
-		public NewFileAction(String text, Icon icon, String desc,
+		public NewAction(String text, Icon icon, String desc,
 				KeyStroke accelerator) {
 			super(text, icon);
 			putValue(SHORT_DESCRIPTION, desc);
@@ -368,22 +408,7 @@ public class MainWindow extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-
-			JFileChooser fileChooser = new JFileChooser();
-			int retVal = fileChooser.showOpenDialog(MainWindow.this);
-
-			// get the filepath and try and open the file
-			if (retVal == JFileChooser.APPROVE_OPTION) {
-				File file = fileChooser.getSelectedFile();
-
-				if (!file.exists()) {
-					logger.log(Level.SEVERE, "File doesn't exist!!");
-					DialogUtil.showErrorDialog(MainWindow.this, "File Error ",
-							"Error finding file!");
-
-				}
-				startNewAppInstance(file.getAbsolutePath());
-			}
+			startNewAppInstance();
 		}
 	}
 
@@ -401,14 +426,14 @@ public class MainWindow extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-
+			
 			if (questions.isEmpty()) {
 				return;
 			}
 
 			if (!fileManager.hasOpenFile()) {
 
-				JFileChooser fileChooser = new JFileChooser();
+				JFileChooser fileChooser = new JFileChooserApprove();
 				int retVal = fileChooser.showSaveDialog(MainWindow.this);
 
 				// get the filepath and try and open the file
@@ -425,9 +450,11 @@ public class MainWindow extends JFrame {
 					}
 					statusBar.setStatus("File " + fileManager.getOpenFilepath()
 							+ " open for writing...");
+				}else {
+					return;
 				}
 			}
-
+			
 			ArrayList<String> questionsCopy = questions;
 			questions = new ArrayList<String>();
 			for (String question : questionsCopy) {
@@ -437,7 +464,7 @@ public class MainWindow extends JFrame {
 			saveFileAction.setEnabled(false);
 		}
 	}
-
+	
 	class OpenFileAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -452,33 +479,23 @@ public class MainWindow extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			if (fileManager.hasOpenFile()) {
-				boolean ok = DialogUtil
-						.showOkCancelWarningDialog(MainWindow.this,
-								"Open file ?",
-								"Opening a new file will close\nthe current file that is open!");
-				if (!ok) {
-					return;
-				}
-			}
-
 			JFileChooser fileChooser = new JFileChooser();
-			int retVal = fileChooser.showOpenDialog(null);
+			int retVal = fileChooser.showOpenDialog(MainWindow.this);
 
+			// get the filepath and try and open the file
 			if (retVal == JFileChooser.APPROVE_OPTION) {
 				File file = fileChooser.getSelectedFile();
 
-				boolean ok = fileManager.addFileAndOpen(file);
+				if (!file.exists()) {
+					logger.log(Level.SEVERE, "File doesn't exist!!");
+					DialogUtil.showErrorDialog(MainWindow.this, "File Error ",
+							"Error finding file!");
+					
+					return;
 
-				if (!ok) {
-					DialogUtil
-							.showErrorDialog(MainWindow.this, "File Error",
-									"Error opening file\nEnsure the file is not open in another application");
 				}
+				startNewAppInstance(file.getAbsolutePath());
 			}
-
-			statusBar.setStatus("File " + fileManager.getOpenFilepath()
-					+ " open for writing...");
 		}
 	}
 
