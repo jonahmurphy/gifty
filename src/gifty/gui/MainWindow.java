@@ -82,7 +82,7 @@ public class MainWindow extends JFrame {
 	private FileManager fileManager;
 	private ArrayList<String> questions;
 
-	private NewAction newFileAction;
+	private NewAction newAction;
 
 	public MainWindow() {
 		fileManager = new FileManager();
@@ -139,16 +139,16 @@ public class MainWindow extends JFrame {
 		mainPanel = new JPanel(new MigLayout("", "grow,fill",
 				"[][grow,fill, push][]"));
 
-		newFileAction = new NewAction("New File", createIcon("New_24x24"),
-				"Open an existing GIFT file", KeyStroke.getKeyStroke("ctrl N"));
+		newAction = new NewAction("New", createIcon("New_24x24"),
+				"Start a new instance of Gifty", KeyStroke.getKeyStroke("ctrl N"));
 
-		openFileAction = new OpenFileAction("Open File",
+		openFileAction = new OpenFileAction("Open...",
 				createIcon("Open_24x24"), "Open an existing GIFT file",
 				KeyStroke.getKeyStroke("ctrl O"));
 
-		saveFileAction = new SaveFileAction("Save File",
+		saveFileAction = new SaveFileAction("Save...",
 				createIcon("Save_24x24"),
-				"Save current file GIFT question file",
+				"Save questions to GIFT file",
 				KeyStroke.getKeyStroke("ctrl S"));
 
 		clearQuestionAction = new ClearQuestionAction("Clear Question",
@@ -156,7 +156,7 @@ public class MainWindow extends JFrame {
 				KeyStroke.getKeyStroke('K', KeyEvent.CTRL_MASK));
 
 		newQuestionAction = new NewQuestionAction("New Question",
-				createIcon("Check_24x24"), "New Question",
+				createIcon("Check_24x24"), "Add Question",
 				KeyStroke.getKeyStroke('F', KeyEvent.CTRL_MASK));
 
 		saveFileAction.setEnabled(false);
@@ -192,13 +192,13 @@ public class MainWindow extends JFrame {
 		JMenu fileMenu = new JMenu("File");
 		JMenuItem saveFileMenuItem = new JMenuItem(saveFileAction);
 		JMenuItem openFileMenuItem = new JMenuItem(openFileAction);
-		JMenuItem newFileMenuItem = new JMenuItem(newFileAction);
-		saveFileMenuItem.setIcon(null);
-		openFileMenuItem.setIcon(null);
+		JMenuItem newMenuItem = new JMenuItem(newAction);
+		//saveFileMenuItem.setIcon(null);
+		//openFileMenuItem.setIcon(null);
 
 		fileMenu.add(saveFileMenuItem);
 		fileMenu.add(openFileMenuItem);
-		fileMenu.add(newFileMenuItem);
+		fileMenu.add(newMenuItem);
 		menuBar.add(fileMenu);
 
 		setJMenuBar(menuBar);
@@ -209,7 +209,7 @@ public class MainWindow extends JFrame {
 		JToolBar toolBar = new JToolBar("");
 		toolBar.setFloatable(false);
 		toolBar.setRollover(true);
-		JButton newFileButton = new JButton(newFileAction);
+		JButton newFileButton = new JButton(newAction);
 		JButton openFileButton = new JButton(openFileAction);
 		JButton saveFileButton = new JButton(saveFileAction);
 		JButton clearQuestionButton = new JButton(clearQuestionAction);
