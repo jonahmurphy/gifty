@@ -31,9 +31,7 @@ class JFileChooserApproveSave extends JFileChooser {
 			}
 		}else {
 			
-		}
-		
-		super.approveSelection();
-		
+		}	
+		super.approveSelection();	
 	}
 }

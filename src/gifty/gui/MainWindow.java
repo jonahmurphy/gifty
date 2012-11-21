@@ -45,7 +45,6 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
@@ -61,6 +60,8 @@ public class MainWindow extends JFrame {
 
 	private final static Logger logger = Logger.getLogger(MainWindow.class
 			.getName());
+	
+	private final static String ICONS_PATH = "/resources/must-have-icon-set-png/png/";
 
 	private static final int LOG_SIZE_IN_BYTES = 20000;
 	private static final int LOG_ROTATION_COUNT = 100;
@@ -72,8 +73,11 @@ public class MainWindow extends JFrame {
 
 	private Action openFileAction;
 	private Action saveFileAction;
+	private Action newAction;
+	private Action saveFileAsAction;
 	private Action clearQuestionAction;
 	private Action newQuestionAction;
+	
 
 	private JTabbedPane tabbedPane;
 	private StatusBar statusBar;
@@ -82,7 +86,7 @@ public class MainWindow extends JFrame {
 	private FileManager fileManager;
 	private ArrayList<String> questions;
 
-	private NewAction newAction;
+
 
 	/**
 	 * Start the app with no file open
@@ -96,12 +100,13 @@ public class MainWindow extends JFrame {
 
 	/**
 	 * Start the app with a file that will be appended to..
+	 * 
 	 * @param filepath
 	 */
 	public MainWindow(String filepath) {
 		this();
 
-		//open the file to append to ...
+		// open the file to append to ...
 		boolean ok = fileManager.addFileAndOpen(new File(filepath), true);
 
 		if (!ok) {
@@ -140,6 +145,7 @@ public class MainWindow extends JFrame {
 
 	public void initUI() {
 		setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+		//setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 
 		statusBar = new StatusBar();
 		statusBar.setStatus("No File open");
@@ -148,16 +154,20 @@ public class MainWindow extends JFrame {
 				"[][grow,fill, push][]"));
 
 		newAction = new NewAction("New", createIcon("New_24x24"),
-				"Start a new instance of Gifty", KeyStroke.getKeyStroke("ctrl N"));
+				"Start a new instance of Gifty",
+				KeyStroke.getKeyStroke("ctrl N"));
 
 		openFileAction = new OpenFileAction("Open...",
 				createIcon("Open_24x24"), "Open an existing GIFT file",
 				KeyStroke.getKeyStroke("ctrl O"));
 
 		saveFileAction = new SaveFileAction("Save...",
-				createIcon("Save_24x24"),
-				"Save questions to GIFT file",
+				createIcon("Save_24x24"), "Save questions to GIFT file",
 				KeyStroke.getKeyStroke("ctrl S"));
+
+		saveFileAsAction = new SaveFileAsAction("Save As...",
+				createIcon("SaveAs_26x26"), "Save questions to GIFT file",
+				KeyStroke.getKeyStroke("ctrl alt S"));
 
 		clearQuestionAction = new ClearQuestionAction("Clear Question",
 				createIcon("Delete_24x24"), "Clear Question",
@@ -168,6 +178,7 @@ public class MainWindow extends JFrame {
 				KeyStroke.getKeyStroke('F', KeyEvent.CTRL_MASK));
 
 		saveFileAction.setEnabled(false);
+		saveFileAsAction.setEnabled(false);
 
 		createMenubar();
 		toolbar = createToolbar();
@@ -198,15 +209,15 @@ public class MainWindow extends JFrame {
 	public void createMenubar() {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
-		JMenuItem saveFileMenuItem = new JMenuItem(saveFileAction);
-		JMenuItem openFileMenuItem = new JMenuItem(openFileAction);
-		JMenuItem newMenuItem = new JMenuItem(newAction);
-		//saveFileMenuItem.setIcon(null);
-		//openFileMenuItem.setIcon(null);
 
-		fileMenu.add(saveFileMenuItem);
-		fileMenu.add(openFileMenuItem);
-		fileMenu.add(newMenuItem);
+		Action[] actions = { saveFileAction, saveFileAsAction, openFileAction,
+				newAction };
+
+		for (Action action : actions) {
+			JMenuItem menuItem = new JMenuItem(action);
+			fileMenu.add(menuItem);
+		}
+
 		menuBar.add(fileMenu);
 
 		setJMenuBar(menuBar);
@@ -217,23 +228,15 @@ public class MainWindow extends JFrame {
 		JToolBar toolBar = new JToolBar("");
 		toolBar.setFloatable(false);
 		toolBar.setRollover(true);
-		JButton newFileButton = new JButton(newAction);
-		JButton openFileButton = new JButton(openFileAction);
-		JButton saveFileButton = new JButton(saveFileAction);
-		JButton clearQuestionButton = new JButton(clearQuestionAction);
-		JButton saveQuestionButton = new JButton(newQuestionAction);
 
-		newFileButton.setText("");
-		openFileButton.setText("");
-		saveFileButton.setText("");
-		clearQuestionButton.setText("");
-		saveQuestionButton.setText("");
+		Action[] actions = { newAction, openFileAction, saveFileAction,
+				saveFileAsAction , newQuestionAction, clearQuestionAction};
 
-		toolBar.add(newFileButton);
-		toolBar.add(openFileButton);
-		toolBar.add(saveFileButton);
-		toolBar.add(saveQuestionButton);
-		toolBar.add(clearQuestionButton);
+		for (Action action : actions) {
+			JButton button = new JButton(action);
+			button.setText("");
+			toolBar.add(button);
+		}
 
 		return toolBar;
 	}
@@ -241,7 +244,7 @@ public class MainWindow extends JFrame {
 	public JTabbedPane createTabbedpane() {
 
 		tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
-		tabbedPane.addTab("True/False", new TrueFalseQuestionPanel());
+		tabbedPane.addTab("True / False", new TrueFalseQuestionPanel());
 		tabbedPane.addTab("Multiple Choice", new JPanel());
 		tabbedPane.addTab("Essay", new JPanel());
 		tabbedPane.addTab("Fill in the Blank", new JPanel());
@@ -255,8 +258,7 @@ public class MainWindow extends JFrame {
 	}
 
 	private Icon createIcon(String imageName) {
-		String imageLocation = "/resources/must-have-icon-set-png/png/"
-				+ imageName + ".png";
+		String imageLocation = ICONS_PATH + imageName + ".png";
 		java.net.URL imageURL = getClass().getResource(imageLocation);
 
 		if (imageURL == null) {
@@ -295,22 +297,21 @@ public class MainWindow extends JFrame {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
-	
-	
+
 	private void startNewAppInstance() {
 		ProcessBuilder pb = new ProcessBuilder("java", "-jar", "*.jar");
 		startNewAppInstance(pb);
 
 	}
-	
+
 	private void startNewAppInstance(String filepath) {
 		ProcessBuilder pb = new ProcessBuilder("java", "-jar", "*.jar",
 				filepath);
-		
+
 		startNewAppInstance(pb);
-		
+
 	}
-	
+
 	private void startNewAppInstance(ProcessBuilder pb) {
 		// if running from eclipse...
 		File eclipse = new File((new File(".")).getAbsoluteFile(), "build");
@@ -328,10 +329,8 @@ public class MainWindow extends JFrame {
 			DialogUtil.showErrorDialog(MainWindow.this,
 					"Error opening instance!", "Could not find jar file!\n");
 
-		}	
+		}
 	}
-
-
 
 	/**
 	 * Try to start the process belonging to the processBuilder
@@ -373,7 +372,6 @@ public class MainWindow extends JFrame {
 
 		return false;
 	}
-	
 
 	// ///////////////////////////////////////////////////
 	// actions
@@ -396,6 +394,60 @@ public class MainWindow extends JFrame {
 		}
 	}
 
+	class SaveFileAsAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		public SaveFileAsAction(String text, Icon icon, String desc,
+				KeyStroke accelerator) {
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(ACCELERATOR_KEY, accelerator);
+
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+
+			if (questions.isEmpty()) {
+				return;
+			}
+
+
+			JFileChooser fileChooser = new JFileChooserApproveSave();
+			int retVal = fileChooser.showSaveDialog(MainWindow.this);
+
+			// get the filepath and try and open the file
+			if (retVal == JFileChooser.APPROVE_OPTION) {
+				File file = fileChooser.getSelectedFile();
+
+				// overwrite the file if it exists already
+				boolean ok = fileManager.addFileAndOpen(file, false);
+
+				if (!ok) {
+					DialogUtil.showErrorDialog(MainWindow.this,
+							"File error", "Error creating file");
+
+					return;
+				}
+				statusBar.setStatus("File " + fileManager.getOpenFilepath()
+						+ " open for writing...");
+			} else {
+				return;
+			}
+
+
+			ArrayList<String> questionsCopy = questions;
+			questions = new ArrayList<String>();
+			for (String question : questionsCopy) {
+				fileManager.appendStringToFile(question + "\n\n");
+			}
+			fileManager.saveFile();
+			saveFileAction.setEnabled(false);
+			saveFileAsAction.setEnabled(false);
+		}
+	}
+
 	class SaveFileAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -410,7 +462,7 @@ public class MainWindow extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			
+
 			if (questions.isEmpty()) {
 				return;
 			}
@@ -424,7 +476,7 @@ public class MainWindow extends JFrame {
 				if (retVal == JFileChooser.APPROVE_OPTION) {
 					File file = fileChooser.getSelectedFile();
 
-					//overwrite the file if it exists already
+					// overwrite the file if it exists already
 					boolean ok = fileManager.addFileAndOpen(file, false);
 
 					if (!ok) {
@@ -435,11 +487,11 @@ public class MainWindow extends JFrame {
 					}
 					statusBar.setStatus("File " + fileManager.getOpenFilepath()
 							+ " open for writing...");
-				}else {
+				} else {
 					return;
 				}
 			}
-			
+
 			ArrayList<String> questionsCopy = questions;
 			questions = new ArrayList<String>();
 			for (String question : questionsCopy) {
@@ -447,9 +499,10 @@ public class MainWindow extends JFrame {
 			}
 			fileManager.saveFile();
 			saveFileAction.setEnabled(false);
+			saveFileAsAction.setEnabled(false);
 		}
 	}
-	
+
 	class OpenFileAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -475,7 +528,7 @@ public class MainWindow extends JFrame {
 					logger.log(Level.SEVERE, "File doesn't exist!!");
 					DialogUtil.showErrorDialog(MainWindow.this, "File Error ",
 							"Error finding file!");
-					
+
 					return;
 
 				}
@@ -506,6 +559,7 @@ public class MainWindow extends JFrame {
 			}
 			questions.add(formattedQuestion);
 			saveFileAction.setEnabled(true);
+			saveFileAsAction.setEnabled(true);
 
 		}
 	}
