@@ -21,6 +21,7 @@ import gifty.core.FileManager;
 import gifty.core.IQuestion;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -187,11 +188,7 @@ public class GiftyApp extends JFrame {
 		mainPanel.add(statusBar, "growx");
 		setContentPane(mainPanel);
 
-		// Maximise the frame
-		setState(Frame.NORMAL);
-		Toolkit toolkit = Toolkit.getDefaultToolkit();
-		Dimension dimension = toolkit.getScreenSize();
-		setSize(dimension);
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		addWindowListener(new WindowAdapter() {
@@ -200,6 +197,13 @@ public class GiftyApp extends JFrame {
 				System.exit(0);
 			}
 		});
+		
+		// Maximise the frame
+		setState(Frame.NORMAL);
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Dimension dimension = toolkit.getScreenSize();
+		setSize(dimension);
+		pack();
 
 	}
 
@@ -241,17 +245,19 @@ public class GiftyApp extends JFrame {
 	public JTabbedPane createTabbedpane() {
 
 		tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
-		
-		tabbedPane.addTab("Multiple Choice", new JPanel());	
+			
 		tabbedPane.addTab("Fill in the Blank", new JPanel());	
 		tabbedPane.addTab("Math range", new JPanel());
 		tabbedPane.addTab("Math range with interval end points", new JPanel());
 		tabbedPane.addTab("Numeric", new JPanel());
 	
+		tabbedPane.addTab("Multiple Choice", new MultipleChoiceQuestionPanel());	
 		tabbedPane.addTab("Short Answer", new ShortAnswerQuestionPanel());
 		tabbedPane.addTab("True / False", new TrueFalseQuestionPanel());
 		tabbedPane.addTab("Matching", new MatchingQuestionPanel());
 		tabbedPane.addTab("Essay", new EssayQuestionPanel());
+		
+		tabbedPane.setFont( new Font( "Dialog", Font.BOLD, 11) );
 		
 	
 
@@ -306,7 +312,7 @@ public class GiftyApp extends JFrame {
 	}
 
 	private void startNewAppInstance(String filepath) {
-		ProcessBuilder pb = new ProcessBuilder("java", "-jar", "*.jar",
+		ProcessBuilder pb = new ProcessBuilder("java", "-jar", "gifty.jar",
 				filepath);
 
 		startNewAppInstance(pb);
@@ -347,7 +353,7 @@ public class GiftyApp extends JFrame {
 			logger.log(Level.INFO, e.getMessage(), e);
 			return false;
 		}
-		logger.info("estaseaset");
+
 		return isProcessRunning(process);
 	}
 
@@ -554,7 +560,7 @@ public class GiftyApp extends JFrame {
 
 			String formattedQuestion = questionPanel.getFormattedQuestion();
 
-			if (formattedQuestion.compareTo("") == 0) {
+			if (formattedQuestion.isEmpty()) {
 				return;
 			}
 			questions.add(formattedQuestion);

@@ -28,11 +28,10 @@ import java.util.ArrayList;
 
 public class GIFTQuestionFormatter {
 
-	private StringBuilder formattedQuestions;
 	private String[] SPECIAL_CHARS = {"~", "=",  "#", "{",  "}" };
+	private final static String NEWLINECHAR = System.getProperty("line.separator");
 
 	public GIFTQuestionFormatter() {
-		formattedQuestions = new StringBuilder();
 	}
 
 	public String formatTrueFalseQuestion(String questionTitle,
@@ -40,9 +39,9 @@ public class GIFTQuestionFormatter {
 		
 		question = escapeSpecialChars(question);
 
-		String formattedQuestion = String.format("%s %s %s\n",
+		String formattedQuestion = String.format("%s %s %s %s",
 				formatTitle(questionTitle), question, questionIsTrue ? "{T}"
-						: "{F}");
+						: "{F}", NEWLINECHAR);
 
 		return formattedQuestion;
 	}
@@ -53,8 +52,8 @@ public class GIFTQuestionFormatter {
 		question = escapeSpecialChars(question);
 		answer = escapeSpecialChars(answer);
 		
-		String formattedQuestion = String.format("%s %s {=%s}\n",
-				formatTitle(questionTitle), question, answer);
+		String formattedQuestion = String.format("%s %s {=%s}%s",
+				formatTitle(questionTitle), question, answer, NEWLINECHAR);
 		
 
 		return formattedQuestion;
@@ -64,8 +63,8 @@ public class GIFTQuestionFormatter {
 
 		question = escapeSpecialChars(question);
 		
-		String formattedQuestion = String.format("%s %s %s {}\n",
-				formatTitle(questionTitle), question);
+		String formattedQuestion = String.format("%s %s %s {}%s",
+				formatTitle(questionTitle), question, NEWLINECHAR);
 
 		return formattedQuestion;
 	}
@@ -73,22 +72,85 @@ public class GIFTQuestionFormatter {
 	public String formatMatchQuestion(String questionTitle, String question,
 			ArrayList<String[]> matchPairs) {
 
-		String formattedQuestion = String.format("%s %s {\n %s }\n\n",
+		String formattedQuestion = String.format("%s %s { %s }%s",
 				formatTitle(questionTitle), 
-				question, 
-				formatMatchPairs(matchPairs));
+				NEWLINECHAR+question, 
+				formatMatchPairs(matchPairs),
+				NEWLINECHAR+NEWLINECHAR);
 
 		return formattedQuestion;
 	}
-	
-	private String formatTitle(String questionTitle) {
-		if (!questionTitle.isEmpty()) {
-			questionTitle = String.format("::%s::",  questionTitle);
-		}
 
-		return escapeSpecialChars( questionTitle.trim() );
+	
+	public String formatMultipleChoiceQuestion(String questionTitle, String question,
+			ArrayList<Answer> choices, boolean hasMultipleAnswers) {
+		
+		String formattedChoices = "";
+		if(hasMultipleAnswers) {
+			formattedChoices = formatMultipleAnswerChoices(choices); 
+		}else {
+			formattedChoices = formatSingleAnswerChoices(choices); 
+		}
+		
+		String formattedQuestion = String.format("%s %s {%s}%s",
+				formatTitle(questionTitle), 
+				question+NEWLINECHAR, 
+				NEWLINECHAR + formattedChoices,
+				NEWLINECHAR+NEWLINECHAR
+				);
+
+		
+		return formattedQuestion;
+
 	}
 	
+	////////////////////////////////////////////////////////////////////////////////
+	///////////////////////Private helper methods///////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
+	
+	private String formatSingleAnswerChoices(ArrayList<Answer> choices) {
+
+        StringBuilder formattedChoices = new StringBuilder();
+        for(Answer choice : choices) {
+        	
+        	//ignore mal formed choices..
+        	if(choice.getAnswerText().isEmpty()) 
+        		continue;
+        	
+        	formattedChoices.append(
+        			String.format("%s%s%s%s",
+        			choice.isCorrect() ? "=" : "~", 
+        			choice.getAnswerText(), 
+        			formatFeedback(choice.getFeedback()),
+        			NEWLINECHAR)
+        			);
+        }
+        
+        return formattedChoices.toString();	
+	}
+	
+	
+	private String formatMultipleAnswerChoices(ArrayList<Answer> choices) {
+
+        StringBuilder formattedChoices = new StringBuilder();
+        for(Answer choice : choices) {
+        	
+        	//ignore mal formed choices..
+        	if(choice.getAnswerText().isEmpty()) 
+        		continue;
+        	
+        	formattedChoices.append(
+        			String.format("~%%%d%%%s %s",
+        			choice.getMark(), 
+        			choice.getAnswerText(), 
+        			formatFeedback(choice.getFeedback())+NEWLINECHAR)
+        			);
+        } 
+        return formattedChoices.toString();	
+	}
+
+
+
 	private String formatMatchPairs(ArrayList<String[]> matchPairs) {
 		StringBuilder sb = new StringBuilder();
 			
@@ -97,7 +159,7 @@ public class GIFTQuestionFormatter {
 			if(matchPair[0].isEmpty() || matchPair[1].isEmpty())
 				continue;
 			
-			sb.append(String.format(" =%s -> %s \n", matchPair[0], matchPair[1]));		
+			sb.append(String.format(" =%s -> %s", matchPair[0], matchPair[1]+NEWLINECHAR));		
 		}
 		return escapeSpecialChars( sb.toString() );
 	}
@@ -110,6 +172,20 @@ public class GIFTQuestionFormatter {
 		
 		return str;
 	}
+	
+	
+	private String formatTitle(String questionTitle) {
+		if (!questionTitle.isEmpty()) {
+			questionTitle = escapeSpecialChars( String.format("::%s::",  questionTitle) );
+		}
 
+		return questionTitle.trim();
+	}
+	
+	private String formatFeedback(String feedback) {
+		String formattedFeedback = feedback.isEmpty() ? "" : " # "+feedback;
+		
+		return formattedFeedback;
+	}
 
 }
