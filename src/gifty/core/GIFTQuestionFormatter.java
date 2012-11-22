@@ -74,7 +74,7 @@ public class GIFTQuestionFormatter {
 
 		String formattedQuestion = String.format("%s %s { %s }%s",
 				formatTitle(questionTitle), 
-				NEWLINECHAR+question, 
+				NEWLINECHAR+escapeSpecialChars(question), 
 				formatMatchPairs(matchPairs),
 				NEWLINECHAR+NEWLINECHAR);
 
@@ -94,7 +94,7 @@ public class GIFTQuestionFormatter {
 		
 		String formattedQuestion = String.format("%s %s {%s}%s",
 				formatTitle(questionTitle), 
-				question+NEWLINECHAR, 
+				escapeSpecialChars(question)+NEWLINECHAR, 
 				NEWLINECHAR + formattedChoices,
 				NEWLINECHAR+NEWLINECHAR
 				);
@@ -120,7 +120,7 @@ public class GIFTQuestionFormatter {
         	formattedChoices.append(
         			String.format("%s%s%s%s",
         			choice.isCorrect() ? "=" : "~", 
-        			choice.getAnswerText(), 
+        			escapeSpecialChars(choice.getAnswerText()), 
         			formatFeedback(choice.getFeedback()),
         			NEWLINECHAR)
         			);
@@ -142,7 +142,7 @@ public class GIFTQuestionFormatter {
         	formattedChoices.append(
         			String.format("~%%%d%%%s %s",
         			choice.getMark(), 
-        			choice.getAnswerText(), 
+        			escapeSpecialChars(choice.getAnswerText()), 
         			formatFeedback(choice.getFeedback())+NEWLINECHAR)
         			);
         } 
@@ -159,9 +159,25 @@ public class GIFTQuestionFormatter {
 			if(matchPair[0].isEmpty() || matchPair[1].isEmpty())
 				continue;
 			
-			sb.append(String.format(" =%s -> %s", matchPair[0], matchPair[1]+NEWLINECHAR));		
+			sb.append(String.format(" =%s -> %s", escapeSpecialChars(matchPair[0]), 
+												  escapeSpecialChars(matchPair[1])+NEWLINECHAR));		
 		}
-		return escapeSpecialChars( sb.toString() );
+		return sb.toString();
+	}
+
+	
+	private String formatTitle(String questionTitle) {
+		if (!questionTitle.isEmpty()) {
+			questionTitle = escapeSpecialChars( String.format("::%s::",  escapeSpecialChars(questionTitle)) );
+		}
+
+		return questionTitle.trim();
+	}
+	
+	private String formatFeedback(String feedback) {
+		String formattedFeedback = feedback.isEmpty() ? "" : " # "+escapeSpecialChars(feedback);
+		
+		return formattedFeedback;
 	}
 	
 	private String escapeSpecialChars(String str) {
@@ -173,19 +189,5 @@ public class GIFTQuestionFormatter {
 		return str;
 	}
 	
-	
-	private String formatTitle(String questionTitle) {
-		if (!questionTitle.isEmpty()) {
-			questionTitle = escapeSpecialChars( String.format("::%s::",  questionTitle) );
-		}
-
-		return questionTitle.trim();
-	}
-	
-	private String formatFeedback(String feedback) {
-		String formattedFeedback = feedback.isEmpty() ? "" : " # "+feedback;
-		
-		return formattedFeedback;
-	}
 
 }
