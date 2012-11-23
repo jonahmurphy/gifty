@@ -21,55 +21,49 @@ package gifty.gui;
 import gifty.core.GIFTQuestionFormatter;
 import gifty.core.IQuestion;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
 
 public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 
+	private static final long serialVersionUID = 1L;
+
 	private final static Logger logger = Logger
 			.getLogger(TrueFalseQuestionPanel.class.getName());
 
 	private GIFTQuestionFormatter formatter;
-	private JTextField questionTitleTextfield;
-	private ScrollableTextArea questionTextarea;
-	private JTextField answerTextfield;
 
+	// widgets
+	private JTextField questionTitleTextfield;
+	private JScrollPane answersScrollpane;
+	private JButton addAnswerButton;
+	private JButton deleteCheckedButton;
+	private ScrollableTextArea questionTextarea;
+
+	private ArrayList<AnswerRow> answerRows;
+
+	private static final String[] ROWLABELS = { "A", "B", "C", "D", "E", "F",
+			"G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
+			"T", "U", "V", "W", "X", "Y", "Z" };
+
+	private static final int MAX_ROWS = ROWLABELS.length;
+	public static final int DEFAULT_NROWS = 3;
+	private int nRows;
 
 	public ShortAnswerQuestionPanel() {
 		formatter = new GIFTQuestionFormatter();
 		initLayout();
-	}
-
-	public void initLayout() {
-		
-		//build
-		JLabel questionTitleLbl = new JLabel("Question Title (optional)");
-		questionTitleTextfield = new JTextField(20);
-
-		JLabel questionLbl = new JLabel("Question");
-		questionTextarea = new ScrollableTextArea();
-		
-		JLabel answerLbl = new JLabel("Answer");
-		answerTextfield = new JTextField(20);
-		
-
-		//layout
-		setLayout(new MigLayout("", "[][grow]", "[][grow][]"));
-
-		add(questionTitleLbl, "align right");
-		add(questionTitleTextfield, "growx, wrap");
-		
-		add(questionLbl, "align right top");
-		add(questionTextarea, "grow, wrap");
-
-		add(answerLbl, "align right top");
-		add(answerTextfield, "growx, wrap");
 	}
 
 	@Override
@@ -77,27 +71,209 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 		String questionTitle = questionTitleTextfield.getText();
 		String question = questionTextarea.getText();
 
-		if (question.isEmpty()) {
+		if (question.compareTo("") == 0) {
 			DialogUtils.showEmptyQuestionBodyWarning(this);
 			return "";
 		}
 		
-		String answer = answerTextfield.getText();
-		
-		if (answer.isEmpty()) {
-			DialogUtils.showErrorDialog(this, "Empty Field", "You need to add an answer!");
-			return "";
+		ArrayList<String> answers = new ArrayList<String>();
+		for(AnswerRow questionRow : answerRows) {
+			answers.add(questionRow.getAnswerText());
 		}
 
-		String formattedQuestion = formatter.shortAnswerQuestion(
-				questionTitle, question, answer);
+		String formattedQuestion = formatter.formatShortAnswerQuestion(questionTitle,
+				question, answers);
 		return formattedQuestion;
 	}
 
 	@Override
 	public void clearQuestion() {
 		questionTitleTextfield.setText("");
-		questionTextarea.setText("");
+		resetRows();
 	}
 
+	private void initLayout() {
+		// build
+		JLabel questionTitleLbl = new JLabel("Question Title (optional)");
+		questionTitleTextfield = new JTextField(20);
+
+		JLabel questionLbl = new JLabel("Question");
+		questionTextarea = new ScrollableTextArea();
+
+		addAnswerButton = new JButton("Add Answer...");
+		deleteCheckedButton = new JButton("Deleted checked...");
+
+		JLabel answersLbl = new JLabel("Answers");
+		answersScrollpane = new JScrollPane();
+		answersScrollpane
+				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+		// layout
+		setLayout(new MigLayout("",
+				// cols
+				"[][grow]",
+
+				// rows
+				"[]" + 
+				"10" + 
+				"[grow 1, align top]" + 
+				"10"+ 
+				"[grow 1000, fill, align top]" + 
+				"[align top]"));
+
+		add(questionTitleLbl, "align right");
+		add(questionTitleTextfield, "growx, wrap");
+
+		add(questionLbl, "align right top");
+		add(questionTextarea, "growx, height 200::200, wrap 40");
+
+		add(answersLbl, "align right");
+		add(answersScrollpane, "grow, wrap 30");
+
+		add(addAnswerButton, "cell 1 3, split 3, align right, width 180::180");
+		add(deleteCheckedButton, "align right, wrap, width 180::180");
+
+		resetRows();
+
+		// bind
+		addAnswerButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				addAnswerRow();
+				revalidate();
+
+				if (nRows == 1) {
+					deleteCheckedButton.setEnabled(true);
+				} else if (nRows == MAX_ROWS) {
+					addAnswerButton.setEnabled(false);
+				}
+			}
+		});
+
+		deleteCheckedButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				deleteCheckedQuestions();
+				revalidate();
+
+				if (nRows == 0) {
+					deleteCheckedButton.setEnabled(false);
+				} else if (nRows < MAX_ROWS) {
+					addAnswerButton.setEnabled(true);
+				}
+			}
+		});
+	}
+
+	private void deleteCheckedQuestions() {
+		ArrayList<AnswerRow> rowsCopy 
+			= (ArrayList<AnswerRow>) answerRows.clone();
+		
+		for (AnswerRow rowPanel : rowsCopy) {
+			if (rowPanel.isMarkedForDeletion()) {
+				answerRows.remove(rowPanel);
+				nRows--;
+			}
+		}
+
+		relabelRows();
+		buildRows();
+	}
+
+	private void addNAnswerRows(int n) {
+		for (int i = 0; i < n; i++) {
+			if (nRows < MAX_ROWS) {
+				answerRows.add(new AnswerRow(ROWLABELS[nRows]));
+				nRows++;
+			}
+		}
+		buildRows();
+	}
+
+	private void addAnswerRow() {
+		if (nRows < MAX_ROWS) {
+			answerRows.add(new AnswerRow(ROWLABELS[nRows]));
+			nRows++;
+			buildRows();
+		}
+	}
+
+	private void resetRows() {
+		answerRows = new ArrayList<AnswerRow>();
+		nRows = 0;
+		addNAnswerRows(DEFAULT_NROWS);
+	}
+
+	/**
+	 * Relabel the rows jlabels so that they go from A,B, C .. Z in sequential
+	 * ascending order
+	 */
+	private void relabelRows() {
+		int i = 0;
+		for (AnswerRow rowPanel : answerRows) {
+			rowPanel.setLabelText(ROWLABELS[i++]);
+		}
+	}
+
+	/**
+	 * N.B We must recreate the viewport view each time so that that each new
+	 * panel is drawn properly
+	 */
+	private void buildRows() {
+		JPanel basePanel = new JPanel(new MigLayout("fill", "[]", "[]"));
+
+		for (AnswerRow rowPanel : answerRows) {
+			basePanel.add(rowPanel, "growx,wrap");
+
+		}
+		answersScrollpane.setViewportView(basePanel);
+	}
+
+	private class AnswerRow extends JPanel {
+		private static final long serialVersionUID = 1L;
+
+		private String labelText;
+
+		private JLabel label;
+		private JTextField textField;
+		private JCheckBox deleteCb;
+
+		public AnswerRow(String labelText) {
+			this.labelText = labelText;
+
+			initLayout();
+		}
+
+		public boolean isMarkedForDeletion() {
+			return deleteCb.isSelected();
+		}
+
+		public String getAnswerText() {
+			return  textField.getText();
+		}
+
+		public void setLabelText(String name) {
+			this.labelText = name;
+			revalidate();
+		}
+
+		public String getLabelText() {
+			return labelText;
+		}
+
+		private void initLayout() {
+			setLayout(new MigLayout("", "[][grow][100::]",
+					"[40::40]"));
+
+			textField = new JTextField(10);
+			label = new JLabel(labelText);
+			deleteCb = new JCheckBox("Delete");
+
+			add(label, "align right, width 10::10");
+			add(textField, "align right, growx");
+			add(deleteCb);
+		}
+	}
 }

@@ -34,24 +34,50 @@ public class GIFTQuestionFormatter {
 	public GIFTQuestionFormatter() {
 	}
 
+	/**
+	 * 
+	 * @param questionTitle
+	 * @param question
+	 * @param questionIsTrue
+	 * @return
+	 */
 	public String formatTrueFalseQuestion(String questionTitle,
 			String question, boolean questionIsTrue) {
 		
 		return formatQuestion(questionTitle, question, questionIsTrue ? "T": "F");
 	}
 	
-	public String shortAnswerQuestion(String questionTitle, String question,
-			String answer) {
-		
-		return formatQuestion(questionTitle, question, "="+escapeSpecialChars(answer));
-		
+	/**
+	 * 
+	 * @param questionTitle
+	 * @param question
+	 * @param answers
+	 * @return
+	 */
+	public String formatShortAnswerQuestion(String questionTitle,
+			String question, ArrayList<String> answers) {
+
+		return formatQuestion(questionTitle, question, formatShortAnswers(answers));
 	}
 
+	/**
+	 * 
+	 * @param questionTitle
+	 * @param question
+	 * @return
+	 */
 	public String formatEssayQuestion(String questionTitle, String question) {
 
 		return formatQuestion(questionTitle, question, "");
 	}
 
+	/**
+	 * 
+	 * @param questionTitle
+	 * @param question
+	 * @param matchPairs
+	 * @return
+	 */
 	public String formatMatchQuestion(String questionTitle, String question,
 			ArrayList<String[]> matchPairs) {
 
@@ -60,7 +86,14 @@ public class GIFTQuestionFormatter {
 		return formatQuestion(questionTitle, question, formattedMatches);
 	}
 
-	
+	/**
+	 * 
+	 * @param questionTitle
+	 * @param question
+	 * @param choices
+	 * @param hasMultipleAnswers
+	 * @return
+	 */
 	public String formatMultipleChoiceQuestion(String questionTitle, String question,
 			ArrayList<Answer> choices, boolean hasMultipleAnswers) {
 		
@@ -74,7 +107,13 @@ public class GIFTQuestionFormatter {
 		return formatQuestion(questionTitle, question, formattedChoices);
 	}
 	
-
+	/**
+	 * 
+	 * @param questionTitle
+	 * @param question
+	 * @param answers
+	 * @return
+	 */
 	public String formatNumericalQuestion(String questionTitle,
 			String question, ArrayList<NumericAnswer> answers) {
 		
@@ -86,6 +125,14 @@ public class GIFTQuestionFormatter {
 
 	}
 	
+	/**
+	 * 
+	 * @param questionTitle
+	 * @param question
+	 * @param answer
+	 * @param isIntervalEndPointsType
+	 * @return
+	 */
 	public String formatMathRangeQuestion(String questionTitle,
 			String question, NumericAnswer answer,
 			boolean isIntervalEndPointsType) {
@@ -108,7 +155,33 @@ public class GIFTQuestionFormatter {
 	///////////////////////Private helper methods///////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////
 	
+	/**
+	 * Format answers to a short answer style question
+	 * @param answers
+	 * @return
+	 */
+	public String formatShortAnswers(ArrayList<String> answers) {
+		
+		StringBuilder formattedAnswers = new StringBuilder();
+		formattedAnswers.append(NEWLINECHAR);
+		
+		for (String answer : answers) {
+			// ignore mal formed answers
+			if (answer.isEmpty())
+				continue;
 
+			formattedAnswers.append(String.format("=%s%s", answer, NEWLINECHAR));
+		}
+
+		return formattedAnswers.toString();
+		
+	}
+	
+	/**
+	 * format answers to numerical type questions
+	 * @param answers
+	 * @return
+	 */
 	private String formatNumericalAnswers(ArrayList<NumericAnswer> answers) {
 		StringBuilder formattedAnswers = new StringBuilder();
 		formattedAnswers.append("# ").append(NEWLINECHAR);
@@ -130,7 +203,11 @@ public class GIFTQuestionFormatter {
 	}
 	
 
-
+    /**
+     * format multiple choice answers with a single correct answer
+     * @param choices
+     * @return
+     */
 	private String formatSingleAnswerChoices(ArrayList<Answer> choices) {
 
         StringBuilder formattedChoices = new StringBuilder();
@@ -154,7 +231,11 @@ public class GIFTQuestionFormatter {
         return formattedChoices.toString();	
 	}
 	
-	
+	/**
+	 * format multiple choice answers with multiple correct answers
+	 * @param choices
+	 * @return
+	 */
 	private String formatMultipleAnswerChoices(ArrayList<Answer> choices) {
 
         StringBuilder formattedChoices = new StringBuilder();
@@ -177,7 +258,11 @@ public class GIFTQuestionFormatter {
 	}
 
 
-
+	/**
+	 * format answers for "Matching" type question.
+	 * @param matchPairs
+	 * @return
+	 */
 	private String formatMatchPairs(ArrayList<String[]> matchPairs) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(NEWLINECHAR);
@@ -212,7 +297,11 @@ public class GIFTQuestionFormatter {
 	}
 	
 
-	
+	/**
+	 * 
+	 * @param questionTitle
+	 * @return
+	 */
 	private String formatTitle(String questionTitle) {
 		if (!questionTitle.isEmpty()) {
 			questionTitle = escapeSpecialChars( String.format("::%s::",  escapeSpecialChars(questionTitle)) );
@@ -221,12 +310,22 @@ public class GIFTQuestionFormatter {
 		return questionTitle.trim();
 	}
 	
+	/**
+	 * 
+	 * @param feedback
+	 * @return
+	 */
 	private String formatFeedback(String feedback) {
 		String formattedFeedback = feedback.isEmpty() ? "" : " # "+escapeSpecialChars(feedback);
 		
 		return formattedFeedback;
 	}
 	
+	/**
+	 * 
+	 * @param str
+	 * @return
+	 */
 	private String escapeSpecialChars(String str) {
 		
 		for(String specialChar : SPECIAL_CHARS ) {
@@ -236,6 +335,12 @@ public class GIFTQuestionFormatter {
 		return str;
 	}
 	
+	/**
+	 * format partial feedback 
+	 * e.g output for input of 90 would be %90%
+	 * @param percentage
+	 * @return
+	 */
 	private String formatPartialCredit(int percentage) {
 		if(percentage == 100) {
 			return "";
