@@ -245,18 +245,18 @@ public class GiftyApp extends JFrame {
 	public JTabbedPane createTabbedpane() {
 
 		tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
-			
-		tabbedPane.addTab("Fill in the Blank", new JPanel());	
-		tabbedPane.addTab("Math range", new JPanel());
-		tabbedPane.addTab("Math range with interval end points", new JPanel());
-		tabbedPane.addTab("Numeric", new JPanel());
-	
+		
+		tabbedPane.addTab("Numerical", new NumericalQuestionPanel());
 		tabbedPane.addTab("Multiple Choice", new MultipleChoiceQuestionPanel());	
 		tabbedPane.addTab("Short Answer", new ShortAnswerQuestionPanel());
 		tabbedPane.addTab("True / False", new TrueFalseQuestionPanel());
 		tabbedPane.addTab("Matching", new MatchingQuestionPanel());
 		tabbedPane.addTab("Essay", new EssayQuestionPanel());
 		
+		tabbedPane.addTab("Fill in the Blank", new JPanel());	
+		tabbedPane.addTab("Math range", new JPanel());
+		tabbedPane.addTab("Math range with interval end points", new JPanel());
+			
 		tabbedPane.setFont( new Font( "Dialog", Font.BOLD, 11) );
 		
 	

@@ -18,35 +18,19 @@ public class Answer {
 		this.isCorrect = isCorrect;
 		this.mark  = mark;
 	}
-
 	public Answer(String answer, String feedback, boolean isCorrect) {
-		this.answerText = answer;
-		this.feedback = feedback;
-		this.isCorrect = isCorrect;
-		this.mark  = 100;
-	}
-	
+		this(answer, feedback, isCorrect, 100);
+	}	
 	public Answer(String answer, String feedback, int mark) {
-		this.answerText = answer;
-		this.feedback = feedback;
-		this.mark = mark;
-		this.isCorrect = true;
+		this(answer, feedback, true, mark);		
 	}
-	
 	public Answer(String answer, String feedback) {
-		this.answerText = answer;
-		this.feedback = feedback;
-		this.isCorrect = true;
-		this.mark = 100;
+		this(answer, feedback, true, 100);
 	}
-	
-	
 	public Answer(String answer) {
-		this.answerText = answer;
-		this.feedback = "";
-		this.isCorrect = true;
-		this.mark = 100;
+		this(answer, "", true, 100);
 	}
+	
 	
 	public String getAnswerText() {
 		return answerText;
