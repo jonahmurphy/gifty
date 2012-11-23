@@ -43,6 +43,10 @@ import net.miginfocom.swing.MigLayout;
 
 public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 
+	private static final int MIN_CORRECT_CHOICES = 1;
+
+	private static final int MIN_CHOICES = 2;
+
 	private static final long serialVersionUID = 1L;
 
 	private final static Logger logger = Logger
@@ -80,15 +84,66 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 
 		String formattedQuestion = "";
 
-		if (question.compareTo("") == 0) {
+		if (question.isEmpty()) {
 			DialogUtils.showEmptyQuestionBodyWarning(this);
 			return "";
 		}
 
 		ArrayList<Answer> answers = new ArrayList<Answer>();
-		for (ChoiceAnswerRow answerRow : choiceRows) {
-			answers.add(answerRow.getAnswer());
+		
+		if(hasMultipleRightAnswers()) {	
+			
+			int validCorrectAnswerCount = 0;
+			int validIncorrectAnswerCount = 0;
+
+			for (ChoiceAnswerRow answerRow : choiceRows) {
+				Answer answer = answerRow.getAnswer();
+				answers.add(answer);
+				
+				if(answerRow.isValidIncorrectMultipleAnswer()) {
+					validIncorrectAnswerCount++;
+				}
+				if(answerRow.isValidCorrectMultipleAnswer()) {
+					validCorrectAnswerCount++;
+				}
+			}
+		
+			//validate..
+			if (validCorrectAnswerCount < MIN_CORRECT_CHOICES) {
+				DialogUtils.showErrorDialog(this, "No correct answer",
+						"Your question needs atleast one fully correct answer!");
+				return "";
+			}		
+			System.out.println(validIncorrectAnswerCount + " " + validCorrectAnswerCount);	
+			
+			if ((validIncorrectAnswerCount + validCorrectAnswerCount) < MIN_CHOICES) {
+				DialogUtils.showErrorDialog(this, "Not enough choices",
+						"Your question needs atleast two answer choices!");
+				return "";
+			}
+			
+		}else {
+			int validAnswerCount = 0;
+		
+			for (ChoiceAnswerRow answerRow : choiceRows) {
+				Answer answer = answerRow.getAnswer();
+				answers.add(answer);
+				
+				System.out.println(answer.getAnswerText());
+				if(answerRow.isValidSingleAnswer()) {
+					validAnswerCount++;
+					System.out.println("what the fuck");
+				}
+			}
+			
+			if (validAnswerCount < MIN_CHOICES) {
+				DialogUtils.showErrorDialog(this, "Not enough choices",
+						"Your question needs atleast two answer choices!");
+				return "";
+			}
+			
 		}
+		
 
 		formattedQuestion = formatter.formatMultipleChoiceQuestion(
 				questionTitle, question, answers, hasMultipleRightAnswers());
@@ -99,6 +154,8 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 	@Override
 	public void clearQuestion() {
 		questionTitleTextfield.setText("");
+		addChoiceButton.setEnabled(true);
+		deleteCheckedButton.setEnabled(true);
 		resetRows();
 	}
 
@@ -156,11 +213,7 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 				addChoiceRow();
 				revalidate();
 
-				if (nRows == 1) {
-					deleteCheckedButton.setEnabled(true);
-				} else if (nRows == MAX_ROWS) {
-					addChoiceButton.setEnabled(false);
-				}
+				deleteCheckedButton.setEnabled(true);
 			}
 		});
 
@@ -170,12 +223,8 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 			public void actionPerformed(ActionEvent e) {
 				deleteCheckedChoices();
 				revalidate();
-
-				if (nRows == 0) {
-					deleteCheckedButton.setEnabled(false);
-				} else if (nRows < MAX_ROWS) {
-					addChoiceButton.setEnabled(true);
-				}
+				
+				addChoiceButton.setEnabled(true);
 			}
 		});
 		
@@ -202,6 +251,11 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 			= (ArrayList<ChoiceAnswerRow>) choiceRows.clone();
 		
 		for (ChoiceAnswerRow rowPanel : rowsCopy) {
+			if (nRows == 1) {
+				deleteCheckedButton.setEnabled(false);			
+				break;
+			} 
+			
 			if (rowPanel.isMarkedForDeletion()) {
 				choiceRows.remove(rowPanel);
 				nRows--;
@@ -217,16 +271,22 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 			if (nRows < MAX_ROWS) {
 				choiceRows.add(new ChoiceAnswerRow(ROWLABELS[nRows], isMultipleRightAnswersQuestion));
 				nRows++;
+				
+				if (nRows >= MAX_ROWS) {
+					addChoiceButton.setEnabled(false);
+				}
 			}
 		}
 		buildRows();
 	}
 
 	private void addChoiceRow() {
-		if (nRows < MAX_ROWS) {
+		if(nRows < MAX_ROWS) {
 			choiceRows.add(new ChoiceAnswerRow(ROWLABELS[nRows], hasMultipleRightAnswers()));
 			nRows++;
 			buildRows();
+		}else {
+			addChoiceButton.setEnabled(false);
 		}
 	}
 
@@ -270,6 +330,8 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 
 	
 	private class ChoiceAnswerRow extends JPanel {
+		private static final int MAX_MARK = 100;
+
 		private static final long serialVersionUID = 1L;
 
 		private String labelText;
@@ -321,6 +383,34 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 			revalidate();
 		}
 		
+		public boolean isValidCorrectMultipleAnswer() {
+
+			if(!choiceTextField.getText().isEmpty() &&
+				(Integer)markValueSpinner.getValue() == MAX_MARK) {
+			
+				return true;
+			}
+			
+			return false;
+		}
+		
+		public boolean isValidIncorrectMultipleAnswer() {
+			if(!choiceTextField.getText().isEmpty() &&
+				(Integer)markValueSpinner.getValue() < MAX_MARK){
+				
+				return true;
+			}
+			
+			return false;		
+		}
+		
+			
+		public boolean isValidSingleAnswer() {
+			return !choiceTextField.getText().isEmpty();
+		}
+		
+
+		
 		public void setMarkValueVisible(boolean visible) {
 			markValueSpinner.setVisible(visible);
 			markValueLbl.setVisible(visible);
@@ -340,7 +430,7 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 			markValueLbl = new JLabel("%");
 			correctAnswerRb = new JRadioButton("Correct ?");
 			
-	        SpinnerModel spinnerModel = new SpinnerNumberModel(0, -100, 100, 10);
+	        SpinnerModel spinnerModel = new SpinnerNumberModel(0, -100, MAX_MARK, 10);
 	        markValueSpinner = new JSpinner(spinnerModel);
 			deleteCb = new JCheckBox("Delete");
 			

@@ -37,10 +37,13 @@ import net.miginfocom.swing.MigLayout;
 
 public class MatchingQuestionPanel extends JPanel implements IQuestion {
 
+
+
 	private static final long serialVersionUID = 1L;
 
 	private final static Logger logger = Logger
 			.getLogger(TrueFalseQuestionPanel.class.getName());
+	
 
 	private GIFTQuestionFormatter formatter;
 
@@ -59,6 +62,7 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 
 	private static final int MAX_ROWS = ROWLABELS.length;
 	public static final int DEFAULT_NROWS = 3;
+	private static final int MIN_ROWS = 2;
 	private int nRows;
 
 	public MatchingQuestionPanel() {
@@ -89,6 +93,8 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 	@Override
 	public void clearQuestion() {
 		questionTitleTextfield.setText("");
+		addChoiceButton.setEnabled(true);
+		deleteCheckedButton.setEnabled(true);
 		resetRows();
 	}
 
@@ -141,11 +147,8 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 				addAnotherMatchingQuestion();
 				revalidate();
 
-				if (nRows == 1) {
+				if(nRows > MIN_ROWS) 
 					deleteCheckedButton.setEnabled(true);
-				} else if (nRows == MAX_ROWS) {
-					addChoiceButton.setEnabled(false);
-				}
 			}
 		});
 
@@ -156,11 +159,7 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 				deleteCheckedQuestions();
 				revalidate();
 
-				if (nRows == 0) {
-					deleteCheckedButton.setEnabled(false);
-				} else if (nRows < MAX_ROWS) {
-					addChoiceButton.setEnabled(true);
-				}
+				addChoiceButton.setEnabled(true);
 			}
 		});
 	}
@@ -170,6 +169,11 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 			= (ArrayList<MatchingQuestionRow>) questionRows.clone();
 		
 		for (MatchingQuestionRow rowPanel : rowsCopy) {
+			
+			if(nRows == MIN_ROWS) {
+				deleteCheckedButton.setEnabled(false);
+				break;
+			}
 			if (rowPanel.isMarkedForDeletion()) {
 				questionRows.remove(rowPanel);
 				nRows--;
@@ -185,6 +189,8 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 			if (nRows < MAX_ROWS) {
 				questionRows.add(new MatchingQuestionRow(ROWLABELS[nRows]));
 				nRows++;
+			}else {
+				addChoiceButton.setEnabled(false);
 			}
 		}
 		buildRows();
@@ -195,6 +201,8 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 			questionRows.add(new MatchingQuestionRow(ROWLABELS[nRows]));
 			nRows++;
 			buildRows();
+		}else {
+			addChoiceButton.setEnabled(false);
 		}
 	}
 

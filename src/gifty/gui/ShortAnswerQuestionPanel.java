@@ -100,6 +100,8 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 	@Override
 	public void clearQuestion() {
 		questionTitleTextfield.setText("");
+		addAnswerButton.setEnabled(true);
+		deleteCheckedButton.setEnabled(true);
 		resetRows();
 	}
 	
@@ -155,11 +157,7 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 				addAnswerRow();
 				revalidate();
 
-				if (nRows == 1) {
-					deleteCheckedButton.setEnabled(true);
-				} else if (nRows == MAX_ROWS) {
-					addAnswerButton.setEnabled(false);
-				}
+				deleteCheckedButton.setEnabled(true);
 			}
 		});
 
@@ -170,11 +168,7 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 				deleteCheckedQuestions();
 				revalidate();
 
-				if (nRows == 0) {
-					deleteCheckedButton.setEnabled(false);
-				} else if (nRows < MAX_ROWS) {
-					addAnswerButton.setEnabled(true);
-				}
+				addAnswerButton.setEnabled(true);
 			}
 		});
 	}
@@ -184,6 +178,11 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 			= (ArrayList<AnswerRow>) answerRows.clone();
 		
 		for (AnswerRow rowPanel : rowsCopy) {
+			
+			if(nRows == 1) {
+				deleteCheckedButton.setEnabled(false);
+				break;
+			}
 			if (rowPanel.isMarkedForDeletion()) {
 				answerRows.remove(rowPanel);
 				nRows--;
@@ -199,6 +198,9 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 			if (nRows < MAX_ROWS) {
 				answerRows.add(new AnswerRow(ROWLABELS[nRows]));
 				nRows++;
+			}else {
+				addAnswerButton.setEnabled(false);
+				break;
 			}
 		}
 		buildRows();
@@ -209,6 +211,8 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 			answerRows.add(new AnswerRow(ROWLABELS[nRows]));
 			nRows++;
 			buildRows();
+		}else {
+			addAnswerButton.setEnabled(false);
 		}
 	}
 

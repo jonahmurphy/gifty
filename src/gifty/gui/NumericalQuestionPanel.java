@@ -108,6 +108,8 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 	@Override
 	public void clearQuestion() {
 		questionTitleTextfield.setText("");
+		addAnswerButton.setEnabled(true);
+		deleteCheckedButton.setEnabled(true);
 		resetRows();
 	}
 	
@@ -162,11 +164,7 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 				addAnswerRow();
 				revalidate();
 
-				if (nRows == 1) {
-					deleteCheckedButton.setEnabled(true);
-				} else if (nRows == MAX_ROWS) {
-					addAnswerButton.setEnabled(false);
-				}
+				deleteCheckedButton.setEnabled(true);
 			}
 		});
 
@@ -177,11 +175,7 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 				deleteCheckedAnswers();
 				revalidate();
 
-				if (nRows == 0) {
-					deleteCheckedButton.setEnabled(false);
-				} else if (nRows < MAX_ROWS) {
-					addAnswerButton.setEnabled(true);
-				}
+				addAnswerButton.setEnabled(true);
 			}
 		});
 
@@ -192,7 +186,11 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 		ArrayList<NumericAnswerRow> rowsCopy 
 			= (ArrayList<NumericAnswerRow>) answerRows.clone();
 		
-		for (NumericAnswerRow rowPanel : rowsCopy) {
+		for (NumericAnswerRow rowPanel : rowsCopy) {		
+			if(nRows == 1) {
+				deleteCheckedButton.setEnabled(false);
+				break;
+			}
 			if (rowPanel.isMarkedForDeletion()) {
 				answerRows.remove(rowPanel);
 				nRows--;
@@ -208,6 +206,9 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 			if (nRows < MAX_ROWS) {
 				answerRows.add(new NumericAnswerRow(ROWLABELS[nRows]));
 				nRows++;
+			}else {
+				addAnswerButton.setEnabled(false);
+				break;
 			}
 		}
 		buildRows();
@@ -218,6 +219,8 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 			answerRows.add(new NumericAnswerRow(ROWLABELS[nRows]));
 			nRows++;
 			buildRows();
+		}else {
+			addAnswerButton.setEnabled(false);
 		}
 	}
 
