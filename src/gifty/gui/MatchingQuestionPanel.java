@@ -75,14 +75,26 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 		String questionTitle = questionTitleTextfield.getText();
 		String question = questionTextarea.getText();
 
-		if (question.compareTo("") == 0) {
+		if (question.isEmpty()) {
 			DialogUtils.showEmptyQuestionBodyWarning(this);
 			return "";
 		}
 		
+		int validMatchesCount = 0;
 		ArrayList<String[]> matchPairs = new ArrayList<String[]>();
 		for(MatchingQuestionRow questionRow : questionRows) {
-			 matchPairs.add(questionRow.getMatchPair());
+			String[] matchPair = questionRow.getMatchPair();
+			if(!matchPair[0].isEmpty() && !matchPair[1].isEmpty()) {
+				
+				matchPairs.add(questionRow.getMatchPair());
+				validMatchesCount++;
+			}	
+		}
+		
+		if (validMatchesCount < MIN_ROWS) {
+			DialogUtils.showErrorDialog(this, "Not enough mathces..",
+					"You need to have atleast 2 Match pairs to create a question");
+			return "";
 		}
 
 		String formattedQuestion = formatter.formatMatchQuestion(questionTitle,
