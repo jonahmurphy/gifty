@@ -71,18 +71,29 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 		String questionTitle = questionTitleTextfield.getText();
 		String question = questionTextarea.getText();
 
-		if (question.compareTo("") == 0) {
+		if (question.isEmpty()) {
 			DialogUtils.showEmptyQuestionBodyWarning(this);
 			return "";
 		}
 		
+		int validAnswerCount = 0;
 		ArrayList<String> answers = new ArrayList<String>();
 		for(AnswerRow questionRow : answerRows) {
-			answers.add(questionRow.getAnswerText());
+			
+			String answer = questionRow.getAnswerText();
+			answers.add(answer);
+			if(!answer.isEmpty()) {
+				validAnswerCount++;
+			}
+		}
+			
+		if(validAnswerCount < 1) {
+			DialogUtils.showErrorDialog(this, "No answers error", "Your question needs atleast one answer!");
+			return "";
 		}
 
-		String formattedQuestion = formatter.formatShortAnswerQuestion(questionTitle,
-				question, answers);
+		String formattedQuestion =
+				formatter.formatShortAnswerQuestion(questionTitle, question, answers);
 		return formattedQuestion;
 	}
 
@@ -90,6 +101,11 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 	public void clearQuestion() {
 		questionTitleTextfield.setText("");
 		resetRows();
+	}
+	
+	private boolean validates() {
+		
+		return true;
 	}
 
 	private void initLayout() {
