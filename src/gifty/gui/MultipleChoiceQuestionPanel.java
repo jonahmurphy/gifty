@@ -250,10 +250,7 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 		return multipleRightAnswersCb.isSelected();
 	}
 
-	/*
-	 * A panel a number of rows of jtextFields with labels date driven by the
-	 * fieldNames array in outer class
-	 */
+	
 	private class ChoiceAnswerRow extends JPanel {
 		private static final long serialVersionUID = 1L;
 

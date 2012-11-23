@@ -209,7 +209,7 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 
 	/**
 	 * N.B We must recreate the viewport view each time so that that each new
-	 * panel is drawn properlyS
+	 * panel is drawn properly
 	 */
 	private void buildRows() {
 		JPanel basePanel = new JPanel(new MigLayout("fill", "[]", "[]"));
@@ -221,10 +221,7 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 	}
 	
 
-	/*
-	 * A panel a number of rows of jtextFields with labels date driven by the
-	 * fieldNames array in outer class
-	 */
+
 	private class NumericAnswerRow extends JPanel {
 		private static final long serialVersionUID = 1L;
 
