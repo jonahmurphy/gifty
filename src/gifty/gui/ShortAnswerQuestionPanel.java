@@ -103,10 +103,6 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 		resetRows();
 	}
 	
-	private boolean validates() {
-		
-		return true;
-	}
 
 	private void initLayout() {
 		// build

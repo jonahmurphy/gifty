@@ -76,14 +76,28 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 
 		String formattedQuestion = "";
 
-		if (question.compareTo("") == 0) {
+		if (question.isEmpty()) {
 			DialogUtils.showEmptyQuestionBodyWarning(this);
 			return "";
 		}
 
+		int validCorrectAnswerCount = 0;
 		ArrayList<NumericAnswer> answers = new ArrayList<NumericAnswer>();
 		for (NumericAnswerRow answerRow : answerRows) {
-			answers.add(answerRow.getAnswer());
+			NumericAnswer answer = answerRow.getAnswer();
+			answers.add(answer);
+			
+			if(!answer.getAnswerText().isEmpty() && 
+				answer.getMark() == 100) {
+				validCorrectAnswerCount++;
+			}
+		}
+		
+		
+		if (validCorrectAnswerCount < 1) {
+			DialogUtils.showErrorDialog(this, "No Correct answers error",
+					"Your question needs atleast one fully correct answer!");
+			return "";
 		}
 
 		formattedQuestion = formatter.formatNumericalQuestion(questionTitle, question, answers);
