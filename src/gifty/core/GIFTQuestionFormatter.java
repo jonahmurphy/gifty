@@ -86,6 +86,23 @@ public class GIFTQuestionFormatter {
 
 	}
 	
+	public String formatMathRangeQuestion(String questionTitle,
+			String question, NumericAnswer answer,
+			boolean isIntervalEndPointsType) {
+
+		String formattedAnswer = null;
+		if (isIntervalEndPointsType) {
+			formattedAnswer = String.format("#%f..%f", answer.getRangeMin(),
+					answer.getRangeMax());
+		} else {
+			formattedAnswer = String.format("#%s:%f", answer.getAnswerText(),
+					answer.getTolerance());
+		}
+
+		return formatQuestion(questionTitle, question, formattedAnswer);
+	}
+
+	
 	
 	////////////////////////////////////////////////////////////////////////////////
 	///////////////////////Private helper methods///////////////////////////////////
@@ -105,7 +122,7 @@ public class GIFTQuestionFormatter {
 			formattedAnswers.append(String.format("=%s%s:%d%s %s",
 					formatPartialCredit(answer.getMark()), 
 					escapeSpecialChars(answer.getAnswerText()),
-					answer.getTolerance(), formatFeedback(answer.getFeedback()),
+					(int)answer.getTolerance(), formatFeedback(answer.getFeedback()),
 					NEWLINECHAR));
 		}
 
@@ -226,7 +243,6 @@ public class GIFTQuestionFormatter {
 			return  String.format("%%%d%%", percentage);
 		}
 	}
-	
 
 
 

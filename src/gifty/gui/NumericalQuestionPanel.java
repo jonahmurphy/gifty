@@ -292,6 +292,7 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 			
 			NumberFormat nf = NumberFormat.getNumberInstance();
 			nf.setGroupingUsed(false);
+			nf.setMinimumFractionDigits(1);
 			answerTextField =  new JFormattedTextField(nf);
 			
 			JLabel toleranceLbl = new JLabel("Tolerance +/-");

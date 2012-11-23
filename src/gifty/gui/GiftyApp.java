@@ -199,10 +199,12 @@ public class GiftyApp extends JFrame {
 		});
 		
 		// Maximise the frame
-		setState(Frame.NORMAL);
-		Toolkit toolkit = Toolkit.getDefaultToolkit();
-		Dimension dimension = toolkit.getScreenSize();
-		setSize(dimension);
+		//setState(Frame.NORMAL);
+		//Toolkit toolkit = Toolkit.getDefaultToolkit();
+		//Dimension dimension = toolkit.getScreenSize();
+		
+		setMinimumSize(new Dimension(1150,550));
+		setSize(new Dimension(1150,550));
 		pack();
 
 	}
@@ -246,6 +248,8 @@ public class GiftyApp extends JFrame {
 
 		tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
 		
+		tabbedPane.addTab("Math Range", new MathRangeQuestionPanel());	
+		
 		tabbedPane.addTab("Numerical", new NumericalQuestionPanel());
 		tabbedPane.addTab("Multiple Choice", new MultipleChoiceQuestionPanel());
 		tabbedPane.addTab("Matching", new MatchingQuestionPanel());
@@ -253,14 +257,10 @@ public class GiftyApp extends JFrame {
 		tabbedPane.addTab("True / False", new TrueFalseQuestionPanel());
 		tabbedPane.addTab("Essay", new EssayQuestionPanel());
 		
-		tabbedPane.addTab("Fill in the Blank", new JPanel());	
-		tabbedPane.addTab("Math range", new JPanel());
-		tabbedPane.addTab("Math range with interval end points", new JPanel());
-			
+		//tabbedPane.addTab("Fill in the Blank", new JPanel());		
+		
 		tabbedPane.setFont( new Font( "Dialog", Font.BOLD, 11) );
 		
-	
-
 		return tabbedPane;
 	}
 
