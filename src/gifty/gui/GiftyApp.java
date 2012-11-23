@@ -420,7 +420,7 @@ public class GiftyApp extends JFrame {
 				return;
 			}
 
-			JFileChooser fileChooser = new JFileChooserApproveSave();
+			JFileChooser fileChooser = new JApproveSaveFileChooser();
 			int retVal = fileChooser.showSaveDialog(GiftyApp.this);
 
 			// get the filepath and try and open the file
@@ -474,7 +474,7 @@ public class GiftyApp extends JFrame {
 
 			if (!fileManager.hasOpenFile()) {
 
-				JFileChooser fileChooser = new JFileChooserApproveSave();
+				JFileChooser fileChooser = new JApproveSaveFileChooser();
 				int retVal = fileChooser.showSaveDialog(GiftyApp.this);
 
 				// get the filepath and try and open the file
