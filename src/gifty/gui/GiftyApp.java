@@ -24,11 +24,14 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,6 +40,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -64,6 +68,7 @@ public class GiftyApp extends JFrame {
 			.getName());
 
 	private final static String ICONS_PATH = "/resources/must-have-icon-set-png/png/";
+	private final static String APP_ICON_PATH = "/resources/GIFTY20x20.png";
 	private static final int LOG_SIZE_IN_BYTES = 20000;
 	private static final int LOG_ROTATION_COUNT = 100;
 	private static final String APP_NAME = "Gifty";
@@ -83,7 +88,7 @@ public class GiftyApp extends JFrame {
 
 	private FileManager fileManager;
 	private ArrayList<String> questions;
-
+	
 	/**
 	 * Start the app with no file open
 	 */
@@ -135,8 +140,8 @@ public class GiftyApp extends JFrame {
 			});
 		}
 	}
-
-	public void initUI() {
+	
+ 	public void initUI() {
 		setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 		// setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 
@@ -192,8 +197,10 @@ public class GiftyApp extends JFrame {
 			}
 		});
 		
+		setAppIcon();
 		setMinimumSize(new Dimension(1150,550));
 		setSize(new Dimension(1150,550));
+		//setTitle(APP_NAME);
 		pack();
 	}
 
@@ -283,6 +290,17 @@ public class GiftyApp extends JFrame {
 			logger.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
+	
+	private void setAppIcon() {
+		BufferedImage image = null;
+		try {
+		    image = ImageIO.read(getClass().getResource(APP_ICON_PATH));
+		} catch (IOException e) {
+			 logger.log(Level.SEVERE, e.getMessage(), e);
+		}
+		setIconImage(image);
+	}
+
 
 	private void startNewAppInstance() {
 		ProcessBuilder pb = new ProcessBuilder("java", "-jar", "*.jar");
