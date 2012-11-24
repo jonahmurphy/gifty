@@ -63,14 +63,10 @@ public class GiftyApp extends JFrame {
 			.getName());
 
 	private final static String ICONS_PATH = "/resources/must-have-icon-set-png/png/";
-
 	private static final int LOG_SIZE_IN_BYTES = 20000;
 	private static final int LOG_ROTATION_COUNT = 100;
-
 	private static final String APP_NAME = "Gifty";
 	private static final String APP_VERSION = "0.1.00001";
-
-	private JPanel mainPanel;
 
 	private Action openFileAction;
 	private Action saveFileAction;
@@ -79,6 +75,7 @@ public class GiftyApp extends JFrame {
 	private Action clearQuestionAction;
 	private Action newQuestionAction;
 
+	private JPanel mainPanel;
 	private JTabbedPane tabbedPane;
 	private StatusBar statusBar;
 	private JToolBar toolbar;
@@ -110,7 +107,6 @@ public class GiftyApp extends JFrame {
 		if (!ok) {
 			Dialog.showErrorDialog(GiftyApp.this, "File error",
 					"Error creating file");
-
 			return;
 		}
 
@@ -119,7 +115,6 @@ public class GiftyApp extends JFrame {
 	}
 
 	public static void main(String[] args) {
-
 		if (args.length == 1) {
 			final String filepath = args[0];
 
@@ -131,7 +126,6 @@ public class GiftyApp extends JFrame {
 				}
 			});
 		} else {
-
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					GiftyApp mainWindow = new GiftyApp();
@@ -188,7 +182,6 @@ public class GiftyApp extends JFrame {
 		mainPanel.add(statusBar, "growx");
 		setContentPane(mainPanel);
 
-		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		addWindowListener(new WindowAdapter() {
@@ -198,15 +191,9 @@ public class GiftyApp extends JFrame {
 			}
 		});
 		
-		// Maximise the frame
-		//setState(Frame.NORMAL);
-		//Toolkit toolkit = Toolkit.getDefaultToolkit();
-		//Dimension dimension = toolkit.getScreenSize();
-		
 		setMinimumSize(new Dimension(1150,550));
 		setSize(new Dimension(1150,550));
 		pack();
-
 	}
 
 	public void createMenubar() {
@@ -222,9 +209,7 @@ public class GiftyApp extends JFrame {
 		}
 
 		menuBar.add(fileMenu);
-
 		setJMenuBar(menuBar);
-
 	}
 
 	public JToolBar createToolbar() {
@@ -240,7 +225,6 @@ public class GiftyApp extends JFrame {
 			button.setText("");
 			toolBar.add(button);
 		}
-
 		return toolBar;
 	}
 
@@ -248,17 +232,14 @@ public class GiftyApp extends JFrame {
 
 		tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
 		
-		tabbedPane.addTab("Math Range", new MathRangeQuestionPanel());	
-		
+		tabbedPane.addTab("Math Range", new MathRangeQuestionPanel());			
 		tabbedPane.addTab("Numerical", new NumericalQuestionPanel());
 		tabbedPane.addTab("Multiple Choice", new MultipleChoiceQuestionPanel());
 		tabbedPane.addTab("Matching", new MatchingQuestionPanel());
 		tabbedPane.addTab("Short Answer", new ShortAnswerQuestionPanel());
 		tabbedPane.addTab("True / False", new TrueFalseQuestionPanel());
 		tabbedPane.addTab("Essay", new EssayQuestionPanel());
-		
-		//tabbedPane.addTab("Fill in the Blank", new JPanel());		
-		
+
 		tabbedPane.setFont( new Font( "Dialog", Font.BOLD, 11) );
 		
 		return tabbedPane;
@@ -274,7 +255,6 @@ public class GiftyApp extends JFrame {
 		} else {
 			return new ImageIcon(imageURL);
 		}
-
 	}
 
 	public void initLogging() {
@@ -308,7 +288,6 @@ public class GiftyApp extends JFrame {
 	private void startNewAppInstance() {
 		ProcessBuilder pb = new ProcessBuilder("java", "-jar", "*.jar");
 		startNewAppInstance(pb);
-
 	}
 
 	private void startNewAppInstance(String filepath) {
@@ -316,7 +295,6 @@ public class GiftyApp extends JFrame {
 				filepath);
 
 		startNewAppInstance(pb);
-
 	}
 
 	private void startNewAppInstance(ProcessBuilder pb) {
@@ -331,11 +309,10 @@ public class GiftyApp extends JFrame {
 		File jar = new File(".");
 		pb.directory(jar);
 		if (tryStartProcess(pb)) {
-			// return;
+			return;
 		} else {
 			Dialog.showErrorDialog(GiftyApp.this,
 					"Error opening instance!", "Could not find jar file!\n");
-
 		}
 	}
 
@@ -353,7 +330,6 @@ public class GiftyApp extends JFrame {
 			logger.log(Level.INFO, e.getMessage(), e);
 			return false;
 		}
-
 		return isProcessRunning(process);
 	}
 
@@ -376,8 +352,34 @@ public class GiftyApp extends JFrame {
 			}
 			logger.log(Level.INFO, e.getMessage(), e);
 		}
-
 		return false;
+	}
+	
+
+	private boolean trySaveAs() {
+		JFileChooser fileChooser = new JApproveSaveFileChooser();
+		int retVal = fileChooser.showSaveDialog(GiftyApp.this);
+
+		// get the filepath and try and open the file
+		if (retVal == JFileChooser.APPROVE_OPTION) {
+			File file = fileChooser.getSelectedFile();
+
+			// overwrite the file if it exists already
+			boolean ok = fileManager.addFileAndOpen(file, false);
+
+			if (!ok) {
+				Dialog.showErrorDialog(GiftyApp.this,
+						"File error", "Error creating file");
+				return false;
+			}else {
+				statusBar.setStatus("File " + fileManager.getOpenFilepath()
+						+ " open for writing...");
+				return true;
+			}
+		} else {
+			return false;
+		}	
+
 	}
 
 	// ///////////////////////////////////////////////////
@@ -392,7 +394,6 @@ public class GiftyApp extends JFrame {
 			super(text, icon);
 			putValue(SHORT_DESCRIPTION, desc);
 			putValue(ACCELERATOR_KEY, accelerator);
-
 		}
 
 		@Override
@@ -410,43 +411,17 @@ public class GiftyApp extends JFrame {
 			super(text, icon);
 			putValue(SHORT_DESCRIPTION, desc);
 			putValue(ACCELERATOR_KEY, accelerator);
-
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			if (questions.isEmpty()) {
+			if (questions.isEmpty() || !trySaveAs()) {
 				return;
 			}
 
-			JFileChooser fileChooser = new JApproveSaveFileChooser();
-			int retVal = fileChooser.showSaveDialog(GiftyApp.this);
-
-			// get the filepath and try and open the file
-			if (retVal == JFileChooser.APPROVE_OPTION) {
-				File file = fileChooser.getSelectedFile();
-
-				// overwrite the file if it exists already
-				boolean ok = fileManager.addFileAndOpen(file, false);
-
-				if (!ok) {
-					Dialog.showErrorDialog(GiftyApp.this, "File error",
-							"Error creating file");
-
-					return;
-				}
-				statusBar.setStatus("File " + fileManager.getOpenFilepath()
-						+ " open for writing...");
-			} else {
-				return;
-			}
-
-			ArrayList<String> questionsCopy = questions;
-			questions = new ArrayList<String>();
-			for (String question : questionsCopy) {
-				fileManager.appendStringToFile(question + "\n\n");
-			}
+			ArrayList<String>questionsCopy = new ArrayList<String>(questions);
+			fileManager.appendStringsToFile(questionsCopy);
 			fileManager.saveFile();
 			saveFileAction.setEnabled(false);
 			saveFileAsAction.setEnabled(false);
@@ -462,46 +437,20 @@ public class GiftyApp extends JFrame {
 			super(text, icon);
 			putValue(SHORT_DESCRIPTION, desc);
 			putValue(ACCELERATOR_KEY, accelerator);
-
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			if (questions.isEmpty()) {
+			if (questions.isEmpty()) 
 				return;
-			}
-
 			if (!fileManager.hasOpenFile()) {
-
-				JFileChooser fileChooser = new JApproveSaveFileChooser();
-				int retVal = fileChooser.showSaveDialog(GiftyApp.this);
-
-				// get the filepath and try and open the file
-				if (retVal == JFileChooser.APPROVE_OPTION) {
-					File file = fileChooser.getSelectedFile();
-
-					// overwrite the file if it exists already
-					boolean ok = fileManager.addFileAndOpen(file, false);
-
-					if (!ok) {
-						Dialog.showErrorDialog(GiftyApp.this,
-								"File error", "Error creating file");
-
-						return;
-					}
-					statusBar.setStatus("File " + fileManager.getOpenFilepath()
-							+ " open for writing...");
-				} else {
+				if( !trySaveAs() ) {
 					return;
 				}
 			}
-
-			ArrayList<String> questionsCopy = questions;
-			questions = new ArrayList<String>();
-			for (String question : questionsCopy) {
-				fileManager.appendStringToFile(question+"\n");
-			}
+			ArrayList<String>questionsCopy = new ArrayList<String>(questions);
+			fileManager.appendStringsToFile(questionsCopy);
 			fileManager.saveFile();
 			saveFileAction.setEnabled(false);
 			saveFileAsAction.setEnabled(false);
@@ -533,11 +482,9 @@ public class GiftyApp extends JFrame {
 					logger.log(Level.SEVERE, "File doesn't exist!!");
 					Dialog.showErrorDialog(GiftyApp.this, "File Error ",
 							"Error finding file!");
-
-					return;
-
+				}else {
+					startNewAppInstance(file.getAbsolutePath());
 				}
-				startNewAppInstance(file.getAbsolutePath());
 			}
 		}
 	}
@@ -560,13 +507,11 @@ public class GiftyApp extends JFrame {
 
 			String formattedQuestion = questionPanel.getFormattedQuestion();
 
-			if (formattedQuestion.isEmpty()) {
-				return;
+			if (!formattedQuestion.isEmpty()) {
+				questions.add(formattedQuestion);
+				saveFileAction.setEnabled(true);
+				saveFileAsAction.setEnabled(true);
 			}
-			questions.add(formattedQuestion);
-			saveFileAction.setEnabled(true);
-			saveFileAsAction.setEnabled(true);
-
 		}
 	}
 
@@ -587,7 +532,6 @@ public class GiftyApp extends JFrame {
 
 			questionPanel.clearQuestion();
 		}
-
 	}
 
 	public class ExitAction extends AbstractAction {

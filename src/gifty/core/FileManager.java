@@ -27,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -104,6 +105,18 @@ public class FileManager {
 			return false;
 		}
 		writer.println(string);
+		return true;
+	}
+	
+	public boolean appendStringsToFile(ArrayList<String> strings) {
+		if (file == null || !file.canWrite()) {
+			logger.info("Could not write to file...");
+			return false;
+		}
+		
+		for (String string : strings) {
+			writer.println(string);
+		}
 		return true;
 	}
 
