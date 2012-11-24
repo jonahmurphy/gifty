@@ -67,7 +67,7 @@ public class EssayQuestionPanel extends JPanel implements IQuestion {
 		String question = questionTextarea.getText();
 
 		if (question.compareTo("") == 0) {
-			DialogUtils.showEmptyQuestionBodyWarning(this);
+			Dialog.showEmptyQuestionBodyWarning(this);
 			return "";
 		}
 

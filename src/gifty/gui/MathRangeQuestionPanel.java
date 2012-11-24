@@ -102,27 +102,27 @@ public class MathRangeQuestionPanel extends JPanel implements IQuestion{
 	private boolean validates() {
 		
 		if (questionTextarea.getText().isEmpty()) {
-			DialogUtils.showEmptyQuestionBodyWarning(this);
+			Dialog.showEmptyQuestionBodyWarning(this);
 			return false;
 		}
 			
 		if(isIntervalEndPointsType()) {
 			if( startPointTextField.getText().isEmpty() ||
 					endPointTextField.getText().isEmpty()) {
-				DialogUtils.showErrorDialog(this, "Empty field!", "Missing interval points!");
+				Dialog.showErrorDialog(this, "Empty field!", "Missing interval points!");
 				return false;
 			}
 			
 			if( Double.parseDouble(startPointTextField.getText()) >=
 				Double.parseDouble(endPointTextField.getText()) ) {
 				
-				DialogUtils.showErrorDialog(this, "Value error", "Start point should be less then the end point!");
+				Dialog.showErrorDialog(this, "Value error", "Start point should be less then the end point!");
 				return false;
 			}
 			
 		} else {
 			if(answerTextField.getText().isEmpty()) {
-				DialogUtils.showErrorDialog(this, "Empty field!", "A question needs an answer!");
+				Dialog.showErrorDialog(this, "Empty field!", "A question needs an answer!");
 				return false;
 			}
 		}
@@ -169,7 +169,7 @@ public class MathRangeQuestionPanel extends JPanel implements IQuestion{
 				"[][grow]40" +   //label + textfield
 				"[][grow]40" +   //label + textfield
 				"[][grow]40"     //label + textfield
-				, "[][grow][]0[]"));
+				, "[][grow][]"));
 
 		add(questionTitleLbl, "align right");
 		add(questionTitleTextfield, "growx, span 9, wrap");
@@ -179,14 +179,14 @@ public class MathRangeQuestionPanel extends JPanel implements IQuestion{
 		
 		add(rangeTypeCb, "cell 1 2");
 		
-		add(answerLbl, "align right, width 60::60");
+		add(answerLbl, "align right, width 38::38");
 		add(answerTextField, "align right, growx 500, width 60::");
-		add(rangeLbl, "align right, width 60::60");
+		add(rangeLbl, "align right, width 50::50");
 		add(answerRangeSpinner, "align right, growx 500, width 60::");
 		
-		add(startPointLbl, "align right, width 60::60");
+		add(startPointLbl, "align right, width 55::55");
 		add(startPointTextField, "align right, growx 500, width 60::");
-		add(endPointLbl, "align right, width 60::60");
+		add(endPointLbl, "align right, width 50::50");
 		add(endPointTextField, "align right, growx 500, width 60::");
 		
 		setRangeType();

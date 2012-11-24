@@ -37,8 +37,6 @@ import net.miginfocom.swing.MigLayout;
 
 public class MatchingQuestionPanel extends JPanel implements IQuestion {
 
-
-
 	private static final long serialVersionUID = 1L;
 
 	private final static Logger logger = Logger
@@ -76,7 +74,7 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 		String question = questionTextarea.getText();
 
 		if (question.isEmpty()) {
-			DialogUtils.showEmptyQuestionBodyWarning(this);
+			Dialog.showEmptyQuestionBodyWarning(this);
 			return "";
 		}
 		
@@ -92,7 +90,7 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 		}
 		
 		if (validMatchesCount < MIN_ROWS) {
-			DialogUtils.showErrorDialog(this, "Not enough mathces..",
+			Dialog.showErrorDialog(this, "Not enough mathces..",
 					"You need to have atleast 2 Match pairs to create a question");
 			return "";
 		}

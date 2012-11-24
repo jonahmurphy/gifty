@@ -108,7 +108,7 @@ public class GiftyApp extends JFrame {
 		boolean ok = fileManager.addFileAndOpen(new File(filepath), true);
 
 		if (!ok) {
-			DialogUtils.showErrorDialog(GiftyApp.this, "File error",
+			Dialog.showErrorDialog(GiftyApp.this, "File error",
 					"Error creating file");
 
 			return;
@@ -333,7 +333,7 @@ public class GiftyApp extends JFrame {
 		if (tryStartProcess(pb)) {
 			// return;
 		} else {
-			DialogUtils.showErrorDialog(GiftyApp.this,
+			Dialog.showErrorDialog(GiftyApp.this,
 					"Error opening instance!", "Could not find jar file!\n");
 
 		}
@@ -431,7 +431,7 @@ public class GiftyApp extends JFrame {
 				boolean ok = fileManager.addFileAndOpen(file, false);
 
 				if (!ok) {
-					DialogUtils.showErrorDialog(GiftyApp.this, "File error",
+					Dialog.showErrorDialog(GiftyApp.this, "File error",
 							"Error creating file");
 
 					return;
@@ -485,7 +485,7 @@ public class GiftyApp extends JFrame {
 					boolean ok = fileManager.addFileAndOpen(file, false);
 
 					if (!ok) {
-						DialogUtils.showErrorDialog(GiftyApp.this,
+						Dialog.showErrorDialog(GiftyApp.this,
 								"File error", "Error creating file");
 
 						return;
@@ -531,7 +531,7 @@ public class GiftyApp extends JFrame {
 
 				if (!file.exists()) {
 					logger.log(Level.SEVERE, "File doesn't exist!!");
-					DialogUtils.showErrorDialog(GiftyApp.this, "File Error ",
+					Dialog.showErrorDialog(GiftyApp.this, "File Error ",
 							"Error finding file!");
 
 					return;

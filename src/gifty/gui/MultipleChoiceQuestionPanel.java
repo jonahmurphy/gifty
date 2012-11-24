@@ -85,7 +85,7 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 		String formattedQuestion = "";
 
 		if (question.isEmpty()) {
-			DialogUtils.showEmptyQuestionBodyWarning(this);
+			Dialog.showEmptyQuestionBodyWarning(this);
 			return "";
 		}
 
@@ -110,14 +110,14 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 		
 			//validate..
 			if (validCorrectAnswerCount < MIN_CORRECT_CHOICES) {
-				DialogUtils.showErrorDialog(this, "No correct answer",
+				Dialog.showErrorDialog(this, "No correct answer",
 						"Your question needs atleast one fully correct answer!");
 				return "";
 			}		
 			System.out.println(validIncorrectAnswerCount + " " + validCorrectAnswerCount);	
 			
 			if ((validIncorrectAnswerCount + validCorrectAnswerCount) < MIN_CHOICES) {
-				DialogUtils.showErrorDialog(this, "Not enough choices",
+				Dialog.showErrorDialog(this, "Not enough choices",
 						"Your question needs atleast two answer choices!");
 				return "";
 			}
@@ -137,7 +137,7 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 			}
 			
 			if (validAnswerCount < MIN_CHOICES) {
-				DialogUtils.showErrorDialog(this, "Not enough choices",
+				Dialog.showErrorDialog(this, "Not enough choices",
 						"Your question needs atleast two answer choices!");
 				return "";
 			}

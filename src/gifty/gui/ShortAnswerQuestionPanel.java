@@ -72,7 +72,7 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 		String question = questionTextarea.getText();
 
 		if (question.isEmpty()) {
-			DialogUtils.showEmptyQuestionBodyWarning(this);
+			Dialog.showEmptyQuestionBodyWarning(this);
 			return "";
 		}
 		
@@ -88,7 +88,7 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 		}
 			
 		if(validAnswerCount < 1) {
-			DialogUtils.showErrorDialog(this, "No answers error", "Your question needs atleast one answer!");
+			Dialog.showErrorDialog(this, "No answers error", "Your question needs atleast one answer!");
 			return "";
 		}
 

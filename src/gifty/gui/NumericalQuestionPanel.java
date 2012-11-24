@@ -77,7 +77,7 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 		String formattedQuestion = "";
 
 		if (question.isEmpty()) {
-			DialogUtils.showEmptyQuestionBodyWarning(this);
+			Dialog.showEmptyQuestionBodyWarning(this);
 			return "";
 		}
 
@@ -95,7 +95,7 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 		
 		
 		if (validCorrectAnswerCount < 1) {
-			DialogUtils.showErrorDialog(this, "No Correct answers error",
+			Dialog.showErrorDialog(this, "No Correct answers error",
 					"Your question needs atleast one fully correct answer!");
 			return "";
 		}

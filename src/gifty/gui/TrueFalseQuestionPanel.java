@@ -79,7 +79,7 @@ public class TrueFalseQuestionPanel extends JPanel implements IQuestion {
 		boolean isTrue = trueFalseRbgPnl.isButtonSelected(TRUE_BUTTON_NAME);
 
 		if (question.compareTo("") == 0) {
-			DialogUtils.showEmptyQuestionBodyWarning(this);
+			Dialog.showEmptyQuestionBodyWarning(this);
 			return "";
 		}
 
