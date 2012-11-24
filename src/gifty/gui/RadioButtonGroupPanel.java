@@ -30,6 +30,8 @@ import net.miginfocom.swing.MigLayout;
 
 public class RadioButtonGroupPanel extends JPanel {
 
+	private static final long serialVersionUID = 1L;
+
 	private final static Logger logger = Logger.getLogger(RadioButtonGroupPanel.class.getName()); 
 	
 	private String[] buttonNames;
@@ -51,8 +53,7 @@ public class RadioButtonGroupPanel extends JPanel {
 		buttonMap = new HashMap<String, JRadioButton>();
 		this.defaultCheckedButton = defaultCheckedButton;
 		
-		buildButtons();
-		
+		buildButtons();		
 	}
 	
 	public String getSelectedButtonname() {

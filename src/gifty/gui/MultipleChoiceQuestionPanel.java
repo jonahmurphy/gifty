@@ -42,16 +42,21 @@ import javax.swing.SpinnerNumberModel;
 import net.miginfocom.swing.MigLayout;
 
 public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
-
-	private static final int MIN_CORRECT_CHOICES = 1;
-
-	private static final int MIN_CHOICES = 2;
-
 	private static final long serialVersionUID = 1L;
-
+	
 	private final static Logger logger = Logger
 			.getLogger(MultipleChoiceQuestionPanel.class.getName());
-
+	
+	private static final String[] ROWLABELS = { "A", "B", "C", "D", "E", "F",
+		"G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
+		"T", "U", "V", "W", "X", "Y", "Z" };
+	
+	private static final int MIN_CORRECT_CHOICES = 1;
+	private static final int MIN_CHOICES = 2;
+	private static final int MAX_ROWS = ROWLABELS.length;
+	public static final int DEFAULT_NROWS = 3;
+	private int nRows;
+	
 	private GIFTQuestionFormatter formatter;
 
 	// widgets
@@ -63,14 +68,6 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 	private JCheckBox multipleRightAnswersCb;
 	
 	private ArrayList<ChoiceAnswerRow> choiceRows;
-
-	private static final String[] ROWLABELS = { "A", "B", "C", "D", "E", "F",
-			"G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
-			"T", "U", "V", "W", "X", "Y", "Z" };
-
-	private static final int MAX_ROWS = ROWLABELS.length;
-	public static final int DEFAULT_NROWS = 3;
-	private int nRows;
 
 	public MultipleChoiceQuestionPanel() {
 		formatter = new GIFTQuestionFormatter();
@@ -135,13 +132,12 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 					System.out.println("what the fuck");
 				}
 			}
-			
+			//validate..
 			if (validAnswerCount < MIN_CHOICES) {
 				Dialog.showErrorDialog(this, "Not enough choices",
 						"Your question needs atleast two answer choices!");
 				return "";
-			}
-			
+			}	
 		}
 		
 
@@ -156,7 +152,7 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 		questionTitleTextfield.setText("");
 		addChoiceButton.setEnabled(true);
 		deleteCheckedButton.setEnabled(true);
-		resetRows();
+		resetChoiceRows();
 	}
 
 
@@ -203,7 +199,7 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 		add(addChoiceButton, "align right, width 180::180");
 		add(deleteCheckedButton, "align right, wrap, width 180::180");
 
-		resetRows();
+		resetChoiceRows();
 
 		// bind
 		addChoiceButton.addActionListener(new ActionListener() {
@@ -243,13 +239,12 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 		for (ChoiceAnswerRow rowPanel : choiceRows) {
 			rowPanel.setMarkValueVisible(visible);
 		}
-		buildRows();
+		buildChoiceRows();
 	}
 
 	private void deleteCheckedChoices() {
-		ArrayList<ChoiceAnswerRow> rowsCopy 
-			= (ArrayList<ChoiceAnswerRow>) choiceRows.clone();
-		
+		ArrayList<ChoiceAnswerRow> rowsCopy = new ArrayList<ChoiceAnswerRow>(choiceRows);
+
 		for (ChoiceAnswerRow rowPanel : rowsCopy) {
 			if (nRows == 1) {
 				deleteCheckedButton.setEnabled(false);			
@@ -262,8 +257,8 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 			}
 		}
 
-		relabelRows();
-		buildRows();
+		relabelChoiceRows();
+		buildChoiceRows();
 	}
 
 	private void addNChoiceRows(int n, boolean isMultipleRightAnswersQuestion) {
@@ -271,26 +266,25 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 			if (nRows < MAX_ROWS) {
 				choiceRows.add(new ChoiceAnswerRow(ROWLABELS[nRows], isMultipleRightAnswersQuestion));
 				nRows++;
-				
-				if (nRows >= MAX_ROWS) {
-					addChoiceButton.setEnabled(false);
-				}
+			}else {
+				addChoiceButton.setEnabled(false);
+				break;
 			}
 		}
-		buildRows();
+		buildChoiceRows();
 	}
 
 	private void addChoiceRow() {
 		if(nRows < MAX_ROWS) {
 			choiceRows.add(new ChoiceAnswerRow(ROWLABELS[nRows], hasMultipleRightAnswers()));
 			nRows++;
-			buildRows();
+			buildChoiceRows();
 		}else {
 			addChoiceButton.setEnabled(false);
 		}
 	}
 
-	private void resetRows() {
+	private void resetChoiceRows() {
 		choiceRows = new ArrayList<ChoiceAnswerRow>();
 		nRows = 0;
 		addNChoiceRows(DEFAULT_NROWS, hasMultipleRightAnswers());
@@ -300,7 +294,7 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 	 * Relabel the rows jlabels so that they go from A,B, C .. Z in sequential
 	 * ascending order
 	 */
-	private void relabelRows() {
+	private void relabelChoiceRows() {
 		int i = 0;
 		for (ChoiceAnswerRow rowPanel : choiceRows) {
 			rowPanel.setLabelText(ROWLABELS[i++]);
@@ -312,7 +306,7 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 	 * N.B We must recreate the viewport view each time so that that each new
 	 * panel is drawn properlyS
 	 */
-	private void buildRows() {
+	private void buildChoiceRows() {
 		JPanel basePanel = new JPanel(new MigLayout("fill", "[]", "[]"));
 		ButtonGroup correctAnswerButtonGroup = new ButtonGroup();
 
@@ -342,7 +336,6 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 		private JSpinner markValueSpinner;
 		private JTextField feedBackTextField;
 		private JLabel markValueLbl;
-
 		private JRadioButton correctAnswerRb;
 
 		public ChoiceAnswerRow(String labelText) {
@@ -403,13 +396,10 @@ public class MultipleChoiceQuestionPanel extends JPanel implements IQuestion {
 			
 			return false;		
 		}
-		
-			
+				
 		public boolean isValidSingleAnswer() {
 			return !choiceTextField.getText().isEmpty();
 		}
-		
-
 		
 		public void setMarkValueVisible(boolean visible) {
 			markValueSpinner.setVisible(visible);

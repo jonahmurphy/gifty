@@ -42,7 +42,15 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 	private final static Logger logger = Logger
 			.getLogger(TrueFalseQuestionPanel.class.getName());
 	
+	private static final String[] ROWLABELS = { "A", "B", "C", "D", "E", "F",
+		"G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
+		"T", "U", "V", "W", "X", "Y", "Z" };
 
+	private static final int MAX_ROWS = ROWLABELS.length;
+	public static final int DEFAULT_NROWS = 3;
+	private static final int MIN_ROWS = 2;
+	private int nRows;
+	
 	private GIFTQuestionFormatter formatter;
 
 	// widgets
@@ -54,14 +62,6 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 
 	private ArrayList<MatchingQuestionRow> questionRows;
 
-	private static final String[] ROWLABELS = { "A", "B", "C", "D", "E", "F",
-			"G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
-			"T", "U", "V", "W", "X", "Y", "Z" };
-
-	private static final int MAX_ROWS = ROWLABELS.length;
-	public static final int DEFAULT_NROWS = 3;
-	private static final int MIN_ROWS = 2;
-	private int nRows;
 
 	public MatchingQuestionPanel() {
 		formatter = new GIFTQuestionFormatter();
@@ -80,8 +80,10 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 		
 		int validMatchesCount = 0;
 		ArrayList<String[]> matchPairs = new ArrayList<String[]>();
+		
 		for(MatchingQuestionRow questionRow : questionRows) {
 			String[] matchPair = questionRow.getMatchPair();
+			
 			if(!matchPair[0].isEmpty() && !matchPair[1].isEmpty()) {
 				
 				matchPairs.add(questionRow.getMatchPair());
@@ -105,7 +107,7 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 		questionTitleTextfield.setText("");
 		addChoiceButton.setEnabled(true);
 		deleteCheckedButton.setEnabled(true);
-		resetRows();
+		resetAnswerRows();
 	}
 
 	private void initLayout() {
@@ -147,14 +149,14 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 		add(addChoiceButton, "cell 1 3, split 3, align right, width 180::180");
 		add(deleteCheckedButton, "align right, wrap, width 180::180");
 
-		resetRows();
+		resetAnswerRows();
 
 		// bind
 		addChoiceButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				addAnotherMatchingQuestion();
+				addMatchingQuestion();
 				revalidate();
 
 				if(nRows > MIN_ROWS) 
@@ -175,9 +177,8 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 	}
 
 	private void deleteCheckedQuestions() {
-		ArrayList<MatchingQuestionRow> rowsCopy 
-			= (ArrayList<MatchingQuestionRow>) questionRows.clone();
-		
+		ArrayList<MatchingQuestionRow> rowsCopy = new ArrayList<MatchingQuestionRow>(questionRows); 
+
 		for (MatchingQuestionRow rowPanel : rowsCopy) {
 			
 			if(nRows == MIN_ROWS) {
@@ -189,9 +190,8 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 				nRows--;
 			}
 		}
-
-		relabelRows();
-		buildRows();
+		relabelAnswerRows();
+		buildAnswerRows();
 	}
 
 	private void addNMatchingQuestions(int n) {
@@ -201,22 +201,23 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 				nRows++;
 			}else {
 				addChoiceButton.setEnabled(false);
+				break;
 			}
 		}
-		buildRows();
+		buildAnswerRows();
 	}
 
-	private void addAnotherMatchingQuestion() {
+	private void addMatchingQuestion() {
 		if (nRows < MAX_ROWS) {
 			questionRows.add(new MatchingQuestionRow(ROWLABELS[nRows]));
 			nRows++;
-			buildRows();
+			buildAnswerRows();
 		}else {
 			addChoiceButton.setEnabled(false);
 		}
 	}
 
-	private void resetRows() {
+	private void resetAnswerRows() {
 		questionRows = new ArrayList<MatchingQuestionRow>();
 		nRows = 0;
 		addNMatchingQuestions(DEFAULT_NROWS);
@@ -226,7 +227,7 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 	 * Relabel the rows jlabels so that they go from A,B, C .. Z in sequential
 	 * ascending order
 	 */
-	private void relabelRows() {
+	private void relabelAnswerRows() {
 		int i = 0;
 		for (MatchingQuestionRow rowPanel : questionRows) {
 			rowPanel.setLabelsText(ROWLABELS[i++]);
@@ -238,7 +239,7 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 	 * N.B We must recreate the viewport view each time so that that each new
 	 * panel is drawn properlyS
 	 */
-	private void buildRows() {
+	private void buildAnswerRows() {
 		JPanel basePanel = new JPanel(new MigLayout("fill", "[]", "[]"));
 
 		for (MatchingQuestionRow rowPanel : questionRows) {
@@ -275,7 +276,6 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 
 		public String[] getMatchPair() {
 			return new String[] { textField1.getText(), textField2.getText() };
-
 		}
 
 		public void setLabelsText(String name) {

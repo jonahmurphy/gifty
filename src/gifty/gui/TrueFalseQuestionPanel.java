@@ -37,14 +37,14 @@ public class TrueFalseQuestionPanel extends JPanel implements IQuestion {
 	private final static Logger logger = Logger
 			.getLogger(TrueFalseQuestionPanel.class.getName());
 
+	final private static String TRUE_BUTTON_NAME = "True";
+	final private static String FALSE_BUTTON_NAME = "False";
+	
 	private GIFTQuestionFormatter formatter;
 	
 	private JTextField questionTitleTextfield;
 	private ScrollableTextArea questionTextarea;
 	private RadioButtonGroupPanel trueFalseRbgPnl;
-
-	final private static String TRUE_BUTTON_NAME = "True";
-	final private static String FALSE_BUTTON_NAME = "False";
 
 	public TrueFalseQuestionPanel() {
 		formatter = new GIFTQuestionFormatter();

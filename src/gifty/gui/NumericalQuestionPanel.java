@@ -44,6 +44,15 @@ import net.miginfocom.swing.MigLayout;
 public class NumericalQuestionPanel extends JPanel implements IQuestion {
 
 	private static final long serialVersionUID = 1L;
+	
+	private static final String[] ROWLABELS = { "A", "B", "C", "D", "E", "F",
+		"G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
+		"T", "U", "V", "W", "X", "Y", "Z" };
+
+	private static final int MAX_ROWS = ROWLABELS.length;
+	public static final int DEFAULT_NROWS = 3;
+	private static final int MAX_MARK = 100;
+	private int nRows;
 
 	private GIFTQuestionFormatter formatter;
 
@@ -55,14 +64,6 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 	private ScrollableTextArea questionTextarea;
 
 	private ArrayList<NumericAnswerRow> answerRows;
-
-	private static final String[] ROWLABELS = { "A", "B", "C", "D", "E", "F",
-			"G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
-			"T", "U", "V", "W", "X", "Y", "Z" };
-
-	private static final int MAX_ROWS = ROWLABELS.length;
-	public static final int DEFAULT_NROWS = 3;
-	private int nRows;
 
 	public NumericalQuestionPanel() {
 		formatter = new GIFTQuestionFormatter();
@@ -88,12 +89,11 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 			answers.add(answer);
 			
 			if(!answer.getAnswerText().isEmpty() && 
-				answer.getMark() == 100) {
+				answer.getMark() == MAX_MARK) {
 				validCorrectAnswerCount++;
 			}
 		}
-		
-		
+			
 		if (validCorrectAnswerCount < 1) {
 			Dialog.showErrorDialog(this, "No Correct answers error",
 					"Your question needs atleast one fully correct answer!");
@@ -110,7 +110,7 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 		questionTitleTextfield.setText("");
 		addAnswerButton.setEnabled(true);
 		deleteCheckedButton.setEnabled(true);
-		resetRows();
+		resetAnswerRows();
 	}
 	
 	private void initLayout() {
@@ -154,7 +154,7 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 		add(addAnswerButton, "cell 1 3, split 3, align right, width 180::180");
 		add(deleteCheckedButton, "align right, wrap, width 180::180");
 
-		resetRows();
+		resetAnswerRows();
 
 		// bind
 		addAnswerButton.addActionListener(new ActionListener() {
@@ -183,9 +183,8 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 	
 
 	private void deleteCheckedAnswers() {
-		ArrayList<NumericAnswerRow> rowsCopy 
-			= (ArrayList<NumericAnswerRow>) answerRows.clone();
-		
+		ArrayList<NumericAnswerRow> rowsCopy = new ArrayList<NumericAnswerRow>(answerRows);
+
 		for (NumericAnswerRow rowPanel : rowsCopy) {		
 			if(nRows == 1) {
 				deleteCheckedButton.setEnabled(false);
@@ -197,8 +196,8 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 			}
 		}
 
-		relabelRows();
-		buildRows();
+		relabelAnswerRows();
+		buildAnswerRows();
 	}
 
 	private void addNAnswerRows(int n) {
@@ -211,20 +210,20 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 				break;
 			}
 		}
-		buildRows();
+		buildAnswerRows();
 	}
 
 	private void addAnswerRow() {
 		if (nRows < MAX_ROWS) {
 			answerRows.add(new NumericAnswerRow(ROWLABELS[nRows]));
 			nRows++;
-			buildRows();
+			buildAnswerRows();
 		}else {
 			addAnswerButton.setEnabled(false);
 		}
 	}
 
-	private void resetRows() {
+	private void resetAnswerRows() {
 		answerRows = new ArrayList<NumericAnswerRow>();
 		nRows = 0;
 		addNAnswerRows(DEFAULT_NROWS);
@@ -234,11 +233,10 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 	 * Relabel the rows jlabels so that they go from A,B, C .. Z in sequential
 	 * ascending order
 	 */
-	private void relabelRows() {
+	private void relabelAnswerRows() {
 		int i = 0;
 		for (NumericAnswerRow rowPanel : answerRows) {
 			rowPanel.setLabelText(ROWLABELS[i++]);
-
 		}
 	}
 
@@ -246,7 +244,7 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 	 * N.B We must recreate the viewport view each time so that that each new
 	 * panel is drawn properly
 	 */
-	private void buildRows() {
+	private void buildAnswerRows() {
 		JPanel basePanel = new JPanel(new MigLayout("fill", "[]", "[]"));
 
 		for (NumericAnswerRow rowPanel : answerRows) {
@@ -277,15 +275,10 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 			initLayout();
 		}
 
-
 		public boolean isMarkedForDeletion() {
 			return deleteCb.isSelected();
 		}
 		
-		/**
-		 * todo: validation.. to ensure they outputs are numeric..
-		 * @return
-		 */
 		public NumericAnswer getAnswer() {
 			return new NumericAnswer(answerTextField.getText(),
 					feedBackTextField.getText(), (Integer)answerToleranceSpinner.getValue(),
@@ -298,7 +291,6 @@ public class NumericalQuestionPanel extends JPanel implements IQuestion {
 			revalidate();
 		}
 		
-
 		private void initLayout() {
 			// setBorder(BorderFactory.createLineBorder(Color.black));
 			setLayout(new MigLayout("", "[][grow 500]20[]0[]20[][grow 1000]20[][][]",

@@ -43,6 +43,15 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 			.getLogger(TrueFalseQuestionPanel.class.getName());
 
 	private GIFTQuestionFormatter formatter;
+	
+	private static final String[] ROWLABELS = { "A", "B", "C", "D", "E", "F",
+		"G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
+		"T", "U", "V", "W", "X", "Y", "Z" };
+
+	private static final int MIN_ANSWERS = 1;
+	private static final int MAX_ROWS = ROWLABELS.length;
+	public static final int DEFAULT_NROWS = 3;
+	private int nRows;
 
 	// widgets
 	private JTextField questionTitleTextfield;
@@ -52,14 +61,6 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 	private ScrollableTextArea questionTextarea;
 
 	private ArrayList<AnswerRow> answerRows;
-
-	private static final String[] ROWLABELS = { "A", "B", "C", "D", "E", "F",
-			"G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
-			"T", "U", "V", "W", "X", "Y", "Z" };
-
-	private static final int MAX_ROWS = ROWLABELS.length;
-	public static final int DEFAULT_NROWS = 3;
-	private int nRows;
 
 	public ShortAnswerQuestionPanel() {
 		formatter = new GIFTQuestionFormatter();
@@ -87,7 +88,7 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 			}
 		}
 			
-		if(validAnswerCount < 1) {
+		if(validAnswerCount < MIN_ANSWERS) {
 			Dialog.showErrorDialog(this, "No answers error", "Your question needs atleast one answer!");
 			return "";
 		}
@@ -102,7 +103,7 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 		questionTitleTextfield.setText("");
 		addAnswerButton.setEnabled(true);
 		deleteCheckedButton.setEnabled(true);
-		resetRows();
+		resetAnswerRows();
 	}
 	
 
@@ -147,7 +148,7 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 		add(addAnswerButton, "cell 1 3, split 3, align right, width 180::180");
 		add(deleteCheckedButton, "align right, wrap, width 180::180");
 
-		resetRows();
+		resetAnswerRows();
 
 		// bind
 		addAnswerButton.addActionListener(new ActionListener() {
@@ -174,12 +175,11 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 	}
 
 	private void deleteCheckedQuestions() {
-		ArrayList<AnswerRow> rowsCopy 
-			= (ArrayList<AnswerRow>) answerRows.clone();
-		
+		ArrayList<AnswerRow> rowsCopy = new ArrayList<AnswerRow>(answerRows);
+	
 		for (AnswerRow rowPanel : rowsCopy) {
 			
-			if(nRows == 1) {
+			if(nRows == MIN_ANSWERS) {
 				deleteCheckedButton.setEnabled(false);
 				break;
 			}
@@ -188,9 +188,8 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 				nRows--;
 			}
 		}
-
-		relabelRows();
-		buildRows();
+		relabelAnswerRows();
+		buildAnswerRows();
 	}
 
 	private void addNAnswerRows(int n) {
@@ -203,20 +202,20 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 				break;
 			}
 		}
-		buildRows();
+		buildAnswerRows();
 	}
 
 	private void addAnswerRow() {
 		if (nRows < MAX_ROWS) {
 			answerRows.add(new AnswerRow(ROWLABELS[nRows]));
 			nRows++;
-			buildRows();
+			buildAnswerRows();
 		}else {
 			addAnswerButton.setEnabled(false);
 		}
 	}
 
-	private void resetRows() {
+	private void resetAnswerRows() {
 		answerRows = new ArrayList<AnswerRow>();
 		nRows = 0;
 		addNAnswerRows(DEFAULT_NROWS);
@@ -226,7 +225,7 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 	 * Relabel the rows jlabels so that they go from A,B, C .. Z in sequential
 	 * ascending order
 	 */
-	private void relabelRows() {
+	private void relabelAnswerRows() {
 		int i = 0;
 		for (AnswerRow rowPanel : answerRows) {
 			rowPanel.setLabelText(ROWLABELS[i++]);
@@ -237,7 +236,7 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 	 * N.B We must recreate the viewport view each time so that that each new
 	 * panel is drawn properly
 	 */
-	private void buildRows() {
+	private void buildAnswerRows() {
 		JPanel basePanel = new JPanel(new MigLayout("fill", "[]", "[]"));
 
 		for (AnswerRow rowPanel : answerRows) {

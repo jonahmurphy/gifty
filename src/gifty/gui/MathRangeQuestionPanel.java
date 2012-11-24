@@ -41,7 +41,10 @@ import net.miginfocom.swing.MigLayout;
 
 public class MathRangeQuestionPanel extends JPanel implements IQuestion{
 
+	private static final long serialVersionUID = 1L;
+
 	private GIFTQuestionFormatter formatter;
+	
 	private JTextField questionTitleTextfield;
 	private ScrollableTextArea questionTextarea;
 	private JFormattedTextField answerTextField;
@@ -66,6 +69,7 @@ public class MathRangeQuestionPanel extends JPanel implements IQuestion{
 		
 		String formattedQuestion;
 		NumericAnswer answer;
+		
 		if (isIntervalEndPointsType()) {
 			answer = new NumericAnswer(Double.parseDouble(startPointTextField.getText()),
 										Double.parseDouble(endPointTextField.getText()));
@@ -90,8 +94,7 @@ public class MathRangeQuestionPanel extends JPanel implements IQuestion{
 		startPointTextField.setText("");
 		endPointTextField.setText("");
 		answerRangeSpinner.setValue(0);
-		answerTextField.setText("");
-		
+		answerTextField.setText("");		
 		rangeTypeCb.setSelected(false);
 	}
 	
@@ -189,22 +192,20 @@ public class MathRangeQuestionPanel extends JPanel implements IQuestion{
 		add(endPointLbl, "align right, width 50::50");
 		add(endPointTextField, "align right, growx 500, width 60::");
 		
-		setRangeType();
+		updateUIRangeType();
 		
 		//bind
 		rangeTypeCb.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				setRangeType();
+				updateUIRangeType();
 				
 			}
 		});
-		
-
 	}
 	
-	private void setRangeType() {
+	private void updateUIRangeType() {
 		startPointTextField.setEnabled(rangeTypeCb.isSelected());
 		endPointTextField.setEnabled(rangeTypeCb.isSelected());
 		
