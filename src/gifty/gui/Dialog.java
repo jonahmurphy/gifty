@@ -29,6 +29,11 @@ public class Dialog {
 				JOptionPane.ERROR_MESSAGE);
 
 	}
+	
+	public static void showInfoDialog(Component parent, String title, String message) {
+		JOptionPane.showMessageDialog(parent, message, title,
+				JOptionPane.INFORMATION_MESSAGE);		
+	}
 
 	public static boolean showOkCancelWarningDialog(Component parent,
 			String title, String message) {
@@ -46,5 +51,7 @@ public class Dialog {
 		showErrorDialog(parent, "Empty field error",
 				"Your question needs a body to create the question!");
 	}
+	
+
 
 }

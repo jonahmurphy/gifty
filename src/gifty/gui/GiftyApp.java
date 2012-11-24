@@ -20,6 +20,7 @@ package gifty.gui;
 import gifty.core.FileManager;
 import gifty.core.IQuestion;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
@@ -158,7 +159,7 @@ public class GiftyApp extends JFrame {
 				KeyStroke.getKeyStroke("ctrl S"));
 
 		saveFileAsAction = new SaveFileAsAction("Save As...",
-				createIcon("SaveAs_26x26"), "Save questions to GIFT file",
+				createIcon("SaveAs_26x26"), "Save As...",
 				KeyStroke.getKeyStroke("ctrl alt S"));
 
 		clearQuestionAction = new ClearQuestionAction("Clear Question",
@@ -509,6 +510,8 @@ public class GiftyApp extends JFrame {
 				questions.add(formattedQuestion);
 				saveFileAction.setEnabled(true);
 				saveFileAsAction.setEnabled(true);
+				
+				Dialog.showInfoDialog(GiftyApp.this, "Question added", "Question added\nDon't forget to save...");
 			}
 		}
 	}
