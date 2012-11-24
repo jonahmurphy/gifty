@@ -68,7 +68,7 @@ public class TrueFalseQuestionPanel extends JPanel implements IQuestion {
 		add(questionLbl, "align right top");
 		add(questionTextarea, "grow, wrap");
 
-		add(new JLabel("True / False"), "align right top");
+		add(new JLabel("True / False"), "align right");
 		add(trueFalseRbgPnl, "align left");
 	}
 
