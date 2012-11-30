@@ -529,7 +529,9 @@ public class GiftyApp extends JFrame {
 				saveFileAction.setEnabled(true);
 				saveFileAsAction.setEnabled(true);
 				
-				Dialog.showInfoDialog(GiftyApp.this, "Question added", "Question added\nDon't forget to save...");
+				String message = "Don't forget to save your question/s to a file!\n or they will be lost when you close Gifty";
+				
+				Dialog.showWarningDialog(GiftyApp.this, "New Question Added", message);
 			}
 		}
 	}

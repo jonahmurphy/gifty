@@ -30,6 +30,11 @@ public class Dialog {
 
 	}
 	
+	public static void showWarningDialog(Component parent, String title, String message) {
+		JOptionPane.showMessageDialog(parent, message, title,
+				JOptionPane.WARNING_MESSAGE);
+	}
+	
 	public static void showInfoDialog(Component parent, String title, String message) {
 		JOptionPane.showMessageDialog(parent, message, title,
 				JOptionPane.INFORMATION_MESSAGE);		
