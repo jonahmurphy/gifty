@@ -101,6 +101,7 @@ public class ShortAnswerQuestionPanel extends JPanel implements IQuestion {
 	@Override
 	public void clearQuestion() {
 		questionTitleTextfield.setText("");
+		questionTextarea.setText("");
 		addAnswerButton.setEnabled(true);
 		deleteCheckedButton.setEnabled(true);
 		resetAnswerRows();

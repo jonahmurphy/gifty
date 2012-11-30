@@ -105,6 +105,7 @@ public class MatchingQuestionPanel extends JPanel implements IQuestion {
 	@Override
 	public void clearQuestion() {
 		questionTitleTextfield.setText("");
+		questionTextarea.setText("");
 		addChoiceButton.setEnabled(true);
 		deleteCheckedButton.setEnabled(true);
 		resetAnswerRows();
