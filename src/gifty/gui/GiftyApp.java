@@ -440,6 +440,7 @@ public class GiftyApp extends JFrame {
 			ArrayList<String>questionsCopy = new ArrayList<String>(questions);
 			fileManager.appendStringsToFile(questionsCopy);
 			fileManager.saveFile();
+			questions.clear();
 			saveFileAction.setEnabled(false);
 			saveFileAsAction.setEnabled(false);
 		}
@@ -469,6 +470,7 @@ public class GiftyApp extends JFrame {
 			ArrayList<String>questionsCopy = new ArrayList<String>(questions);
 			fileManager.appendStringsToFile(questionsCopy);
 			fileManager.saveFile();
+			questions.clear();
 			saveFileAction.setEnabled(false);
 			saveFileAsAction.setEnabled(false);
 		}
