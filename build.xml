@@ -14,5 +14,6 @@
         <copy todir="build/resources">
    		 <fileset dir="src/resources"/>
 		</copy>       
-    </target>
+
+</target>
 </project>

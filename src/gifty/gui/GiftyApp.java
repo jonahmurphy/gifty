@@ -20,13 +20,8 @@ package gifty.gui;
 import gifty.core.FileManager;
 import gifty.core.IQuestion;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -59,6 +54,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.BevelBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -491,6 +487,8 @@ public class GiftyApp extends JFrame {
 		public void actionPerformed(ActionEvent arg0) {
 
 			JFileChooser fileChooser = new JFileChooser();
+			FileNameExtensionFilter filter = new FileNameExtensionFilter(".txt files", "txt");
+			fileChooser.setFileFilter(filter);
 			int retVal = fileChooser.showOpenDialog(GiftyApp.this);
 
 			// get the filepath and try and open the file
