@@ -54,11 +54,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.BevelBorder;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.miginfocom.swing.MigLayout;
 
 public class GiftyApp extends JFrame {
+
+	private static final long serialVersionUID = 1L;
 
 	private final static Logger logger = Logger.getLogger(GiftyApp.class
 			.getName());
@@ -487,8 +488,6 @@ public class GiftyApp extends JFrame {
 		public void actionPerformed(ActionEvent arg0) {
 
 			JFileChooser fileChooser = new JFileChooser();
-			FileNameExtensionFilter filter = new FileNameExtensionFilter(".txt files", "txt");
-			fileChooser.setFileFilter(filter);
 			int retVal = fileChooser.showOpenDialog(GiftyApp.this);
 
 			// get the filepath and try and open the file
@@ -556,6 +555,8 @@ public class GiftyApp extends JFrame {
 	}
 
 	public class ExitAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
 
 		public ExitAction() {
 			super("Exit", null);
