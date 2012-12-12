@@ -305,7 +305,7 @@ public class GIFTQuestionFormatter {
 	 */
 	private String formatTitle(String questionTitle) {
 		if (!questionTitle.isEmpty()) {
-			questionTitle = escapeSpecialChars( String.format("::%s::",  escapeSpecialChars(questionTitle)) );
+			questionTitle = String.format("::%s::",  escapeSpecialChars(questionTitle));
 		}
 
 		return questionTitle.trim();
